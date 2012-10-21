@@ -24,9 +24,9 @@ extern "C" {
 
 struct eye_config
 {
-    int interval;           // 间隔时间
-    int rest_time;          // 每次休息时间
-    int max_idle_time;      // 最长空闲时间，达到后停止计时
+    unsigned int interval;           // 间隔时间
+    unsigned int rest_time;          // 每次休息时间
+    unsigned int max_idle_time;      // 最长空闲时间，达到后停止计时
 };
 
 extern struct eye_config g_config;

@@ -25,6 +25,7 @@
 #include <limits.h>
 
 #include "config.h"
+#include "eye_log.h"
 
 struct eye_config g_config;
 
@@ -40,6 +41,8 @@ static int conf_to_printf_cb(void* ctx, const char* key, const char* val)
     INI_GET(max_idle_time,       "[Config]max_idle_time");
 
 #undef INI_GET
+
+    return 0;
 }
 
 static char* str_trimn_ex(char* str, const char* delim)
@@ -179,7 +182,7 @@ int config_init()
         return -1;
     }
 
-    strcat(config_path, "/eye_rest.conf");
+    strcat(config_path, "/eyerest.conf");
 
     if (0 != conf_file_parse(config_path, NULL, conf_to_printf_cb))
     {
@@ -191,6 +194,8 @@ int config_init()
     GET_DEFAULT_VALUE(g_config.rest_time,      3*60);
     GET_DEFAULT_VALUE(g_config.max_idle_time,  5*60);
 #undef GET_DEFAULT_VALUE
+
+    eye_debug("interval = %d\nrest_time= %d\nmax_idle_time = %d\n", g_config.interval, g_config.rest_time, g_config.max_idle_time);
     return 0;
 }
 

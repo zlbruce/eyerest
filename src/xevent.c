@@ -22,6 +22,8 @@
 #include <stdlib.h>     /* getenv(), etc. */
 #include <pthread.h>
 
+#include "eye_log.h"
+
 Display* s_display = NULL;
 XRecordContext s_context;
 int s_has_event = 0;
@@ -43,14 +45,15 @@ int xevent_init()
 {
     s_display = XOpenDisplay(getenv("DISPLAY"));
     if (s_display == NULL) {
-        fprintf(stderr, "cannot connect to X server '%s'\n", getenv("DISPLAY"));
+        eye_error("cannot connect to X server '%s'\n", getenv("DISPLAY"));
         return -1;
     }
+
 
     XRecordClientSpec clients = XRecordAllClients;
     XRecordRange* range = XRecordAllocRange();
     if (range == 0) {
-        fprintf(stderr, "unable to allocate XRecordRange\n");
+        eye_error("unable to allocate XRecordRange\n");
         return -1;
     }
 
@@ -58,7 +61,7 @@ int xevent_init()
     range->device_events.last = MotionNotify;
     s_context = XRecordCreateContext (s_display, 0, &clients, 1, &range, 1);
     if (s_context == 0) {
-        fprintf(stderr, "unable to create XRecordContext\n");
+        eye_error("unable to create XRecordContext\n");
         exit(-1);
     }
 
