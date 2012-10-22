@@ -1,12 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  timer.h
+ *       Filename:  state.h
  *
  *    Description:  
  *
  *        Version:  1.0
- *        Created:  2012年10月19日 11时20分37秒
+ *        Created:  2012年10月22日 21时41分27秒
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -16,19 +16,23 @@
  * =====================================================================================
  */
 
-#ifndef __TIMER_H__
-#define __TIMER_H__
+#ifndef __STATE_H__
+#define __STATE_H__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-int timer_init();
+int state_init();
 
-void timer_loop();
+int state_timeout_cb(unsigned int time);
+
+// 用于暂停计数
+void state_active_pause();
+void state_active_unpause();
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  /*__TIMER_H__*/
+#endif  /*__STATE_H__*/
