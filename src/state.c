@@ -36,44 +36,41 @@ struct state_t
 {
     /* 是否可以从from_st进入该状态
      * @param from_st 前一个状态
-     * @return = 0: OK, otherwise: Failed
+     * @return TRUE or FALSE
      */
-    int (*pre_enter)(enum state_e from_st);
+    gboolean (*pre_enter)(enum state_e from_st);
     /* 进入该状态
      * @param from_st 前一个状态
-     * @return = 0: OK, otherwise: Failed
      */
-    int (*enter)(enum state_e from_st);
+    void (*enter)(enum state_e from_st);
     /* 退出该状态
-     * @return = 0: OK, otherwise: Failed
      */
-    int (*leave)();
+    void (*leave)();
 
     /* 定时超时回调
      * @param time 超时时间
-     * @return = 0: OK, otherwise: Failed
      */
-    int (*timeout_cb)(unsigned int time);
+    void (*timeout_cb)(guint time);
 };
 
 
 // ACTIVE STATE
-static int state_active_pre_enter(enum state_e from_st);
-static int state_active_enter(enum state_e from_st);
-static int state_active_leave();
-static int state_active_timeout_cb(unsigned int time);
+static gboolean state_active_pre_enter(enum state_e from_st);
+static void state_active_enter(enum state_e from_st);
+static void state_active_leave();
+static void state_active_timeout_cb(guint time);
 
 // IDLE STATE
-static int state_idle_pre_enter(enum state_e from_st);
-static int state_idle_enter(enum state_e from_st);
-static int state_idle_leave();
-static int state_idle_timeout_cb(unsigned int time);
+static gboolean state_idle_pre_enter(enum state_e from_st);
+static void state_idle_enter(enum state_e from_st);
+static void state_idle_leave();
+static void state_idle_timeout_cb(guint time);
 
 // XLOCK STATE
-static int state_xlock_pre_enter(enum state_e from_st);
-static int state_xlock_enter(enum state_e from_st);
-static int state_xlock_leave();
-static int state_xlock_timeout_cb(unsigned int time);
+static gboolean state_xlock_pre_enter(enum state_e from_st);
+static void state_xlock_enter(enum state_e from_st);
+static void state_xlock_leave();
+static void state_xlock_timeout_cb(guint time);
 
 static struct state_t s_all_st[STATE_MAX] = 
 {
@@ -114,7 +111,7 @@ static struct state_t* get_st(enum state_e st)
     return s_all_st + st;
 }
 
-static int state_change(enum state_e st)
+static gboolean state_change(enum state_e st)
 {
     struct state_t* curret_st = get_st(s_curret_state);
     struct state_t* change_st = get_st(st);
@@ -123,14 +120,13 @@ static int state_change(enum state_e st)
     if(change_st->pre_enter && change_st->pre_enter(s_curret_state) != 0)
     {
         eye_error("can not change to st(%d -> %d)\n", s_curret_state, st);
-        return -1;
+        return FALSE;
     }
 
     if(curret_st->leave)
     {
         curret_st->leave();
     }
-
 
     if(change_st->enter)
     {
@@ -139,15 +135,15 @@ static int state_change(enum state_e st)
 
     s_curret_state = st;
 
-    return 0;
+    return TRUE;
 }
 
-int state_init()
+gboolean state_init()
 {
     return state_change(STATE_ACTIVE);
 }
 
-int state_timeout_cb(unsigned int time)
+void state_timeout_cb(guint time)
 {
     struct state_t* curret_st = get_st(s_curret_state);
 
@@ -157,52 +153,48 @@ int state_timeout_cb(unsigned int time)
     {
         curret_st->timeout_cb(time);
     }
-
-    return 0;
 }
 
 // ACTIVE STATE
-static int s_work_time_left = 0;
-static int s_user_pause = 0;
+static guint s_work_time_left = 0;
+static gboolean s_user_pause = FALSE;
 
 void state_active_pause()
 {
-    s_user_pause = 1;
+    s_user_pause = TRUE;
 }
 
 void state_active_unpause()
 {
-    s_user_pause = 0;
+    s_user_pause = FALSE;
 }
 
-static int state_active_pre_enter(enum state_e from_st)
+static gboolean state_active_pre_enter(enum state_e from_st)
 {
-    return 0;
+    return TRUE;
 }
 
-static int state_active_enter(enum state_e from_st)
+static void state_active_enter(enum state_e from_st)
 {
     s_work_time_left = g_config.interval;
-    return 0;
 }
 
 
-static int state_active_leave()
+static void state_active_leave()
 {
-    return 0;
 }
 
-static int state_active_timeout_cb(unsigned int time)
+static void state_active_timeout_cb(guint time)
 {
     // 记录是否有用户空闲
-    static int s_idle_time = 0;
+    static guint s_idle_time = 0;
 
     eye_debug("work time left = %d\n", s_work_time_left);
 
     // 判断是否需要进入 idle 状态
     if(s_work_time_left <= 0)
     {
-        return state_change(STATE_XLOCK);
+        state_change(STATE_XLOCK);
     }
 
     if(!s_user_pause)
@@ -223,30 +215,27 @@ static int state_active_timeout_cb(unsigned int time)
 
     if(s_idle_time >= g_config.max_idle_time)
     {
-        return state_change(STATE_IDLE);
+        state_change(STATE_IDLE);
     }
 
-    return 0;
 }
 
 
 // IDLE STATE
-static int state_idle_pre_enter(enum state_e from_st)
+static gboolean state_idle_pre_enter(enum state_e from_st)
 {
-    return 0;
+    return TRUE;
 }
 
-static int state_idle_enter(enum state_e from_st)
+static void state_idle_enter(enum state_e from_st)
 {
-    return 0;
 }
 
-static int state_idle_leave()
+static void state_idle_leave()
 {
-    return 0;
 }
 
-static int state_idle_timeout_cb(unsigned int time)
+static void state_idle_timeout_cb(guint time)
 {
     // 如果有鼠标键盘事件，则进入active状态
     if(xevent_has_event())
@@ -254,39 +243,35 @@ static int state_idle_timeout_cb(unsigned int time)
         state_change(STATE_ACTIVE);
     }
     xevent_clear_event();
-    return 0;
 }
 
 
 // XLOCK STATE
-static int s_rest_time = 0;
-static int state_xlock_pre_enter(enum state_e from_st)
+static guint s_rest_time = 0;
+static gboolean state_xlock_pre_enter(enum state_e from_st)
 {
-    return 0;
+    return TRUE;
 }
 
-static int state_xlock_enter(enum state_e from_st)
+static void state_xlock_enter(enum state_e from_st)
 {
     s_rest_time = 0;
     xlock_lockscreen();
-    return 0;
 }
 
-static int state_xlock_leave()
+static void state_xlock_leave()
 {
     xlock_unlockscreen();
-    return 0;
 }
 
-static int state_xlock_timeout_cb(unsigned int time)
+static void state_xlock_timeout_cb(guint time)
 {
     // TODO: 显示剩余时间
     s_rest_time += time;
     if(s_rest_time >= g_config.rest_time)
     {
-        return state_change(STATE_ACTIVE);
+        state_change(STATE_ACTIVE);
     }
 
-    return 0;
 }
 

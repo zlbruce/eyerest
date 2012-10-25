@@ -19,16 +19,14 @@
 #ifndef __TIMER_H__
 #define __TIMER_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <glib.h>
 
-int timer_init();
+G_BEGIN_DECLS
+
+gboolean timer_init();
 
 void timer_loop();
 
-#ifdef __cplusplus
-}
-#endif
+G_END_DECLS
 
 #endif  /*__TIMER_H__*/

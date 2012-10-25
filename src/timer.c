@@ -36,12 +36,14 @@ static void timer_callback(int fd, short event, void* ctx)
     evtimer_add(s_timer, &timeout);
 }
 
-int timer_init()
+gboolean timer_init()
 {
     s_base = event_base_new();
     
     s_timer = evtimer_new(s_base, timer_callback, NULL);
     evtimer_add(s_timer, &timeout);
+
+    return TRUE;
 }
 
 void timer_loop()

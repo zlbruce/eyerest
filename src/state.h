@@ -19,20 +19,17 @@
 #ifndef __STATE_H__
 #define __STATE_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <glib.h>
 
-int state_init();
+G_BEGIN_DECLS
 
-int state_timeout_cb(unsigned int time);
+gboolean state_init();
+
+void state_timeout_cb(guint time);
 
 // 用于暂停计数
 void state_active_pause();
 void state_active_unpause();
 
-#ifdef __cplusplus
-}
-#endif
-
+G_END_DECLS
 #endif  /*__STATE_H__*/

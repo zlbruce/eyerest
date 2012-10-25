@@ -18,27 +18,24 @@
 #ifndef __CONFIG_H__
 #define __CONFIG_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <glib.h>
+
+G_BEGIN_DECLS
 
 struct eye_config
 {
-    unsigned int interval;           // 间隔时间
-    unsigned int rest_time;          // 每次休息时间
-    unsigned int max_idle_time;      // 最长空闲时间，达到后停止计时
+    gint interval;           // 间隔时间
+    gint rest_time;          // 每次休息时间
+    gint max_idle_time;      // 最长空闲时间，达到后停止计时
 };
 
 extern struct eye_config g_config;
-int config_init();
+gboolean config_init();
 
-int config_reinit(struct eye_config* config);
+gboolean config_reinit(struct eye_config* config);
 
-int config_write(struct eye_config* config);
+gboolean config_write(struct eye_config* config);
 
-#ifdef __cplusplus
-}
-#endif
-
+G_END_DECLS
 #endif  /*__CONFIG_H__*/
 

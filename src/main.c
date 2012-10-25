@@ -42,13 +42,13 @@ int main(int argc, char* argv[])
     }
     xevent_run();
 
-    if(state_init() < 0)
+    if(!state_init())
     {
         eye_error("state_init failed\n");
         return -1;
     }
 
-    if (timer_init() < 0)
+    if (!timer_init())
     {
         eye_error("timer_init failed!\n");
         return -1;

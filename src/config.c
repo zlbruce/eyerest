@@ -163,13 +163,14 @@ int check_and_create_dir(char* path)
 
     return mkdir(path, 0700);
 }
-int config_init()
+
+gboolean config_init()
 {
     char config_path[PATH_MAX] = {0};
     char* home = getenv("HOME");
     if(home == NULL)
     {
-        return -1;
+        return FALSE;
     }
     printf("home = %s\n", home);
 
@@ -179,7 +180,7 @@ int config_init()
     if (check_and_create_dir(config_path) < 0)
     {
         printf("check_and_create_dir failed\n");
-        return -1;
+        return FALSE;
     }
 
     strcat(config_path, "/eyerest.conf");
@@ -187,7 +188,7 @@ int config_init()
     if (0 != conf_file_parse(config_path, NULL, conf_to_printf_cb))
     {
         printf("conf_file_parse failed\n");
-        return -1;
+        return FALSE;
     }
 #define GET_DEFAULT_VALUE(s, def) if ((s)==0) {s=def;}
     GET_DEFAULT_VALUE(g_config.interval,       45*60);
@@ -196,17 +197,17 @@ int config_init()
 #undef GET_DEFAULT_VALUE
 
     eye_debug("interval = %d\nrest_time= %d\nmax_idle_time = %d\n", g_config.interval, g_config.rest_time, g_config.max_idle_time);
-    return 0;
+    return TRUE;
 }
 
-int config_reinit(struct eye_config* config)
+gboolean config_reinit(struct eye_config* config)
 {
     // TODO
-    return 0;
+    return TRUE;
 }
 
-int config_write(struct eye_config* config)
+gboolean config_write(struct eye_config* config)
 {
     // TODO
-    return 0;
+    return TRUE;
 }
