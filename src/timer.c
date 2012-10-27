@@ -24,29 +24,26 @@
 
 #define TIMER 1
 
-const struct timeval timeout = {TIMER, 0};
-
-static struct event_base* s_base = NULL;
-static struct event* s_timer;
+static GMainLoop* s_loop = NULL;
 
 
-static void timer_callback(int fd, short event, void* ctx)
+static gboolean timer_callback(gpointer data)
 {
     state_timeout_cb(TIMER);
-    evtimer_add(s_timer, &timeout);
+    return TRUE;
 }
 
 gboolean timer_init()
 {
-    s_base = event_base_new();
-    
-    s_timer = evtimer_new(s_base, timer_callback, NULL);
-    evtimer_add(s_timer, &timeout);
+    s_loop = g_main_loop_new ( NULL , FALSE );
+
+    g_timeout_add_seconds (TIMER, timer_callback, NULL);
 
     return TRUE;
 }
 
 void timer_loop()
 {
-    event_base_dispatch(s_base);
+    g_main_loop_run (s_loop);
+    g_main_loop_unref(s_loop);
 }

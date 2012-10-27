@@ -21,7 +21,6 @@
 #include "xevent.h"
 #include "xlock.h"
 #include "config.h"
-#include "eye_log.h"
 
 enum state_e
 {
@@ -117,9 +116,9 @@ static gboolean state_change(enum state_e st)
     struct state_t* change_st = get_st(st);
 
     // 判断是否可以切换到目的状态
-    if(change_st->pre_enter && change_st->pre_enter(s_curret_state) != 0)
+    if(change_st->pre_enter && !change_st->pre_enter(s_curret_state))
     {
-        eye_error("can not change to st(%d -> %d)\n", s_curret_state, st);
+        g_error("can not change to st(%d -> %d)\n", s_curret_state, st);
         return FALSE;
     }
 
@@ -147,7 +146,7 @@ void state_timeout_cb(guint time)
 {
     struct state_t* curret_st = get_st(s_curret_state);
 
-    eye_debug("curret_st = %d\n", s_curret_state);
+    g_debug("curret_st = %d\n", s_curret_state);
 
     if(curret_st->timeout_cb)
     {
@@ -189,7 +188,7 @@ static void state_active_timeout_cb(guint time)
     // 记录是否有用户空闲
     static guint s_idle_time = 0;
 
-    eye_debug("work time left = %d\n", s_work_time_left);
+    g_debug("work time left = %d\n", s_work_time_left);
 
     // 判断是否需要进入 idle 状态
     if(s_work_time_left <= 0)

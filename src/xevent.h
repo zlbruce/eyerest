@@ -19,28 +19,25 @@
 #ifndef __XEVENT_H__
 #define __XEVENT_H__
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+#include <glib.h>
+
+G_BEGIN_DECLS
 
 // 判断当前是否有鼠标键盘事件
-int xevent_has_event();
+gboolean xevent_has_event();
 
 // 清除所有事件
 void xevent_clear_event();
 
 // 初始化
-int xevent_init();
+gboolean xevent_init();
 
 // 运行监听线程
 void xevent_run();
 
 // 停止监听线程
 void xevent_stop();
-#ifdef __cplusplus
-}
-#endif
 
 
+G_END_DECLS
 #endif  /*__XEVENT_H__*/

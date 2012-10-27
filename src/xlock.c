@@ -23,11 +23,11 @@
 #include <string.h>
 
 #include "xlock.h"
-#include "eye_log.h"
 
 typedef struct {
 	int screen;
 	Window root, win;
+    GC gc;
 	Pixmap pmap;
 } Lock;
 
@@ -39,6 +39,7 @@ static void xlock_unlockeachscreen(Display *dpy, Lock *lock)
 	if(dpy == NULL || lock == NULL)
 		return;
 
+    XFreeGC (dpy, lock->gc);
 	XUngrabPointer(dpy, CurrentTime);
 	XFreePixmap(dpy, lock->pmap);
 	XDestroyWindow(dpy, lock->win);
@@ -52,7 +53,7 @@ static Lock* xlock_lockeachscreen(Display* dpy, int screen)
 	char curs[] = {0, 0, 0, 0, 0, 0, 0, 0};
 	unsigned int len;
 	Lock *lock;
-	XColor black, dummy;
+	XColor black, white, dummy;
 	XSetWindowAttributes wa;
 	Cursor invisible;
 
@@ -74,8 +75,9 @@ static Lock* xlock_lockeachscreen(Display* dpy, int screen)
 			0, DefaultDepth(dpy, lock->screen), CopyFromParent,
 			DefaultVisual(dpy, lock->screen), CWOverrideRedirect | CWBackPixel, &wa);
 	XAllocNamedColor(dpy, DefaultColormap(dpy, lock->screen), "black", &black, &dummy);
+	XAllocNamedColor(dpy, DefaultColormap(dpy, lock->screen), "white", &white, &dummy);
 	lock->pmap = XCreateBitmapFromData(dpy, lock->win, curs, 8, 8);
-	invisible = XCreatePixmapCursor(dpy, lock->pmap, lock->pmap, &black, &black, 0, 0);
+	invisible = XCreatePixmapCursor(dpy, lock->pmap, lock->pmap, &black, &white, 0, 0);
 	XDefineCursor(dpy, lock->win, invisible);
 	XMapRaised(dpy, lock->win);
 	for(len = 1000; len; len--) {
@@ -102,6 +104,18 @@ static Lock* xlock_lockeachscreen(Display* dpy, int screen)
 	else 
 		XSelectInput(dpy, lock->root, SubstructureNotifyMask);
 
+    // 创建GC，用于显示剩余时间
+    unsigned long black_pixel = BlackPixel (dpy, lock->screen);
+    unsigned long white_pixel = WhitePixel (dpy, lock->screen);
+    lock->gc = XCreateGC (dpy, lock->win, 0, 0);
+    XCopyGC (dpy, DefaultGC(dpy, lock->screen), 0, lock->gc);
+    XSetBackground (dpy, lock->gc, black_pixel); 
+    XSetForeground (dpy, lock->gc, white_pixel); 
+    char* word = "hello world!";
+    XClearWindow (dpy, lock->win);
+    XDrawString (dpy, lock->win, lock->gc,
+            0, 0, word, strlen(word));
+
 	return lock;
 }
 
@@ -109,18 +123,18 @@ void xlock_lockscreen()
 {
     if(!(s_dpy = XOpenDisplay(getenv("DISPLAY"))))
     {
-        eye_error("cannot open display");
+        g_error("cannot open display");
         return;
     }
 
     int nscreens = ScreenCount(s_dpy);
     
-    eye_debug("nscreens = %d\n", nscreens);
+    g_debug("nscreens = %d\n", nscreens);
 
 	s_locks = malloc(sizeof(Lock *) * nscreens);
 	if(s_locks == NULL)
     {
-		eye_error("malloc Lock error: %s", strerror(errno));
+		g_error("malloc Lock error: %s", strerror(errno));
         return;
     }
 
@@ -137,11 +151,32 @@ void xlock_unlockscreen()
     int nscreens = ScreenCount(s_dpy);
     int i;
 	for(i = 1; i < nscreens; i++)
+    {
 		xlock_unlockeachscreen(s_dpy, s_locks[i]);
+    }
 
 	free(s_locks);
     s_locks = NULL;
 	XCloseDisplay(s_dpy);
 
     s_dpy = NULL;
+}
+
+void xlock_display_time_on_screen(Display* dpy, Lock* lock, int time)
+{
+    char* word = "hello world!";
+    XClearWindow (dpy, lock->win);
+    XDrawString (dpy, lock->win, lock->gc,
+            0, 0, word, strlen(word));
+}
+
+void xlock_display_time(int time)
+{
+
+    int nscreens = ScreenCount(s_dpy);
+    int i;
+	for(i = 1; i < nscreens; i++)
+    {
+		xlock_display_time_on_screen(s_dpy, s_locks[i], time);
+    }
 }

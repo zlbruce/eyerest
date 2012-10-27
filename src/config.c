@@ -25,7 +25,6 @@
 #include <limits.h>
 
 #include "config.h"
-#include "eye_log.h"
 
 struct eye_config g_config;
 
@@ -196,7 +195,7 @@ gboolean config_init()
     GET_DEFAULT_VALUE(g_config.max_idle_time,  5*60);
 #undef GET_DEFAULT_VALUE
 
-    eye_debug("interval = %d\nrest_time= %d\nmax_idle_time = %d\n", g_config.interval, g_config.rest_time, g_config.max_idle_time);
+    g_debug("interval = %d\nrest_time= %d\nmax_idle_time = %d\n", g_config.interval, g_config.rest_time, g_config.max_idle_time);
     return TRUE;
 }
 

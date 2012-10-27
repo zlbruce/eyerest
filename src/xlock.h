@@ -19,16 +19,14 @@
 #ifndef __XLOCK_H__
 #define __XLOCK_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <glib.h>
+
+G_BEGIN_DECLS
 
 void xlock_lockscreen();
 
 void xlock_unlockscreen();
 
-#ifdef __cplusplus
-}
-#endif
+G_END_DECLS
 
 #endif  /*__XLOCK_H__*/
