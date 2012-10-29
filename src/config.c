@@ -34,9 +34,9 @@ static gboolean verbose = FALSE;
 
 static GOptionEntry entries[] =
 {
-    { "interval", 'i', 0, G_OPTION_ARG_INT, &g_config.interval, "Interval of every rest, set to I second", "I" },
-    { "idle-time", 'd', 0, G_OPTION_ARG_INT, &g_config.max_idle_time, "Idle for D second(no keyboard event and no mouse event), reset the interval", "D" },
-    { "rest-time", 'r', 0, G_OPTION_ARG_INT, &g_config.rest_time, "Rest time", "R"},
+    { "interval", 'i', 0, G_OPTION_ARG_INT, &g_config.interval, "Interval of every rest", "T" },
+    { "idle-time", 'd', 0, G_OPTION_ARG_INT, &g_config.max_idle_time, "Idle time", "T" },
+    { "rest-time", 'r', 0, G_OPTION_ARG_INT, &g_config.rest_time, "Rest time", "T"},
     { "verbose", 'v', 0, G_OPTION_ARG_NONE, &verbose, "Be verbose", NULL },
     { NULL }
 };

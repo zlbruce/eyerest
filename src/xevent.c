@@ -44,7 +44,7 @@ gboolean xevent_init()
 {
     s_display = XOpenDisplay(getenv("DISPLAY"));
     if (s_display == NULL) {
-        g_error("cannot connect to X server '%s'\n", getenv("DISPLAY"));
+        g_critical("cannot connect to X server '%s'\n", getenv("DISPLAY"));
         return FALSE;
     }
 
@@ -52,7 +52,7 @@ gboolean xevent_init()
     XRecordClientSpec clients = XRecordAllClients;
     XRecordRange* range = XRecordAllocRange();
     if (range == 0) {
-        g_error("unable to allocate XRecordRange\n");
+        g_critical("unable to allocate XRecordRange\n");
         return FALSE;
     }
 
@@ -60,7 +60,7 @@ gboolean xevent_init()
     range->device_events.last = MotionNotify;
     s_context = XRecordCreateContext (s_display, 0, &clients, 1, &range, 1);
     if (s_context == 0) {
-        g_error("unable to create XRecordContext\n");
+        g_critical("unable to create XRecordContext\n");
         return FALSE;
     }
 
