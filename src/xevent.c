@@ -66,7 +66,7 @@ gboolean xevent_init()
 
     XFree(range);
 
-    return 0;
+    return TRUE;
 }
 
 static void xevent_event_callback(XPointer p, XRecordInterceptData* data)
