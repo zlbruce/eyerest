@@ -30,11 +30,11 @@ struct eye_config
 };
 
 extern struct eye_config g_config;
-gboolean config_init();
+gboolean config_init(int argc, char* argv[]);
 
-gboolean config_reinit(struct eye_config* config);
+//gboolean config_reinit(struct eye_config* config);
 
-gboolean config_write(struct eye_config* config);
+//gboolean config_write(struct eye_config* config);
 
 G_END_DECLS
 #endif  /*__CONFIG_H__*/
