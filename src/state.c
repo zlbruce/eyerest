@@ -265,8 +265,11 @@ static void state_xlock_leave()
 
 static void state_xlock_timeout_cb(guint time)
 {
-    // TODO: 显示剩余时间
     s_rest_time += time;
+
+    // 显示剩余时间
+    xlock_display_time(g_config.rest_time - s_rest_time);
+
     if(s_rest_time >= g_config.rest_time)
     {
         state_change(STATE_ACTIVE);

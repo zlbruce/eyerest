@@ -18,16 +18,25 @@
 #include <X11/keysym.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#include <X11/Xft/Xft.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
 
 #include "xlock.h"
 
+
+// TODO:把字体，颜色，位置等放到配置文件中
+
+
+
 typedef struct {
 	int screen;
 	Window root, win;
-    GC gc;
+    //GC gc;
+    XftFont* font;
+    XftDraw* draw;
+    XftColor color;
 	Pixmap pmap;
 } Lock;
 
@@ -39,7 +48,12 @@ static void xlock_unlockeachscreen(Display *dpy, Lock *lock)
 	if(dpy == NULL || lock == NULL)
 		return;
 
-    XFreeGC (dpy, lock->gc);
+//    XFreeGC (dpy, lock->gc);
+    
+    XftColorFree (dpy, DefaultVisual(dpy, lock->screen), DefaultColormap(dpy, lock->screen), &lock->color);
+    XftDrawDestroy (lock->draw);
+
+
 	XUngrabPointer(dpy, CurrentTime);
 	XFreePixmap(dpy, lock->pmap);
 	XDestroyWindow(dpy, lock->win);
@@ -53,7 +67,7 @@ static Lock* xlock_lockeachscreen(Display* dpy, int screen)
 	char curs[] = {0, 0, 0, 0, 0, 0, 0, 0};
 	unsigned int len;
 	Lock *lock;
-	XColor black, white, dummy;
+	XColor black, dummy;
 	XSetWindowAttributes wa;
 	Cursor invisible;
 
@@ -70,14 +84,13 @@ static Lock* xlock_lockeachscreen(Display* dpy, int screen)
 
 	/* init */
 	wa.override_redirect = 1;
-	wa.background_pixel = BlackPixel(dpy, lock->screen);
+    wa.background_pixel = BlackPixel(dpy, lock->screen);
 	lock->win = XCreateWindow(dpy, lock->root, 0, 0, DisplayWidth(dpy, lock->screen), DisplayHeight(dpy, lock->screen),
 			0, DefaultDepth(dpy, lock->screen), CopyFromParent,
 			DefaultVisual(dpy, lock->screen), CWOverrideRedirect | CWBackPixel, &wa);
 	XAllocNamedColor(dpy, DefaultColormap(dpy, lock->screen), "black", &black, &dummy);
-	XAllocNamedColor(dpy, DefaultColormap(dpy, lock->screen), "white", &white, &dummy);
 	lock->pmap = XCreateBitmapFromData(dpy, lock->win, curs, 8, 8);
-	invisible = XCreatePixmapCursor(dpy, lock->pmap, lock->pmap, &black, &white, 0, 0);
+	invisible = XCreatePixmapCursor(dpy, lock->pmap, lock->pmap, &black, &black, 0, 0);
 	XDefineCursor(dpy, lock->win, invisible);
 	XMapRaised(dpy, lock->win);
 	for(len = 1000; len; len--) {
@@ -105,16 +118,13 @@ static Lock* xlock_lockeachscreen(Display* dpy, int screen)
 		XSelectInput(dpy, lock->root, SubstructureNotifyMask);
 
     // 创建GC，用于显示剩余时间
-    unsigned long black_pixel = BlackPixel (dpy, lock->screen);
-    unsigned long white_pixel = WhitePixel (dpy, lock->screen);
-    lock->gc = XCreateGC (dpy, lock->win, 0, 0);
-    XCopyGC (dpy, DefaultGC(dpy, lock->screen), 0, lock->gc);
-    XSetBackground (dpy, lock->gc, black_pixel); 
-    XSetForeground (dpy, lock->gc, white_pixel); 
-    char* word = "hello world!";
-    XClearWindow (dpy, lock->win);
-    XDrawString (dpy, lock->win, lock->gc,
-            0, 0, word, strlen(word));
+    //unsigned long white_pixel = WhitePixel (dpy, lock->screen);
+    //lock->gc = XCreateGC (dpy, lock->win, 0, 0);
+    //XSetForeground (dpy, lock->gc, white_pixel); 
+    // 创建用于显示剩余时间的字体，颜色等
+    lock->font = XftFontOpenName(dpy, lock->screen, "Monospace:size=24");
+    lock->draw = XftDrawCreate(dpy, lock->win, DefaultVisual(dpy, lock->screen), DefaultColormap(dpy, lock->screen));
+    XftColorAllocName(dpy, DefaultVisual(dpy, lock->screen), DefaultColormap(dpy, lock->screen), "red", &lock->color);
 
 	return lock;
 }
@@ -164,10 +174,21 @@ void xlock_unlockscreen()
 
 void xlock_display_time_on_screen(Display* dpy, Lock* lock, int time)
 {
-    char* word = "hello world!";
+    static gchar time_str[PATH_MAX];
+    int len = g_snprintf(time_str, PATH_MAX, "%d", time);
     XClearWindow (dpy, lock->win);
-    XDrawString (dpy, lock->win, lock->gc,
-            0, 0, word, strlen(word));
+    //XDrawString (dpy, lock->win, lock->gc,
+    //        20, 20, time_str, MIN(len, PATH_MAX));
+
+    // 暂时先放到正中间
+    XGlyphInfo extents;
+    XftTextExtents8 (dpy, lock->font, time_str, MIN(len, PATH_MAX), &extents);
+
+    int x = DisplayWidth(dpy, lock->screen)/2 - extents.width/2 + extents.x;
+    int y = DisplayHeight(dpy, lock->screen)/2 - extents.height/2 + extents.y;
+
+    XftDrawString8(lock->draw, &lock->color, lock->font, x, y, time_str, MIN(len, PATH_MAX));
+    XFlush(dpy);
 }
 
 void xlock_display_time(int time)
@@ -175,7 +196,7 @@ void xlock_display_time(int time)
 
     int nscreens = ScreenCount(s_dpy);
     int i;
-	for(i = 1; i < nscreens; i++)
+	for(i = 0; i < nscreens; i++)
     {
 		xlock_display_time_on_screen(s_dpy, s_locks[i], time);
     }
