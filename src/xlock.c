@@ -168,26 +168,36 @@ void xlock_unlockscreen()
     s_dpy = NULL;
 }
 
-void xlock_display_time_on_screen(Display* dpy, Lock* lock, int time)
+void xlock_display_time_on_screen(Display* dpy, Lock* lock, time_t time)
 {
     static gchar time_str[PATH_MAX];
-    int len = g_snprintf(time_str, PATH_MAX, "%d", time);
+    struct tm* tm = localtime(&time);
+    int len = 0;
+    if(tm == NULL)
+    {
+        len = g_snprintf(time_str, sizeof(time_str), "%lu", (unsigned long)time);
+    }
+    else
+    {
+        len = strftime(time_str, sizeof(time_str), g_config.format, tm);
+    }
     XClearWindow (dpy, lock->win);
     //XDrawString (dpy, lock->win, lock->gc,
     //        20, 20, time_str, MIN(len, PATH_MAX));
 
     // 计算位置
+    len = MIN(len, sizeof(time_str));
     XGlyphInfo extents;
-    XftTextExtents8 (dpy, lock->font, time_str, MIN(len, PATH_MAX), &extents);
+    XftTextExtentsUtf8 (dpy, lock->font, time_str, len, &extents);
 
-    int x = DisplayWidth(dpy, lock->screen)*g_config.x_coordinate/100 - extents.width/2 + extents.x;
-    int y = DisplayHeight(dpy, lock->screen)*g_config.y_coordinate/100 - extents.height/2 + extents.y;
+    int x = DisplayWidth (dpy, lock->screen) * g_config.x_coordinate / 100 - extents.width/2 + extents.x;
+    int y = DisplayHeight(dpy, lock->screen) * g_config.y_coordinate / 100 - extents.height/2 + extents.y;
 
-    XftDrawString8(lock->draw, &lock->color, lock->font, x, y, time_str, MIN(len, PATH_MAX));
+    XftDrawStringUtf8(lock->draw, &lock->color, lock->font, x, y, time_str, len);
     XFlush(dpy);
 }
 
-void xlock_display_time(int time)
+void xlock_display_time(time_t time)
 {
 
     int nscreens = ScreenCount(s_dpy);

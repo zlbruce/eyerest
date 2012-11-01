@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <signal.h>
+#include <locale.h>
 
 #include <glib.h>
 
@@ -29,11 +30,18 @@
 
 int main(int argc, char* argv[]) 
 {
+    setlocale (LC_ALL, "");
+    g_set_application_name ("eyerest-daemon");
 
     if (!config_init(argc, argv))
     {
         g_critical("config_init failed!\n");
         return -1;
+    }
+
+    if(!g_config.foreground)
+    {
+        daemon(0, 0);
     }
 
     if (!xevent_init())

@@ -27,6 +27,8 @@ void xlock_lockscreen();
 
 void xlock_unlockscreen();
 
+void xlock_display_time(time_t time);
+
 G_END_DECLS
 
 #endif  /*__XLOCK_H__*/

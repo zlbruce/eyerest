@@ -31,12 +31,19 @@ struct eye_config
     // 显示倒计时
     gchar* font;             // 使用的字体
     gchar* color;            // 使用的颜色
+    gchar* format;           // 显示的内容
     gint x_coordinate;       // 显示文本的x坐标（文字的中心）
     gint y_coordinate;       // 显示文本的y坐标（文字的中心）
+
+    // 其他
+    gboolean foreground;     // 前台运行，不挂到后台
 };
 
 extern struct eye_config g_config;
+
 gboolean config_init(int argc, char* argv[]);
+
+//void config_destroy();
 
 //gboolean config_reinit(struct eye_config* config);
 
