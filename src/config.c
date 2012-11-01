@@ -27,7 +27,8 @@
 #include "config.h"
 
 #define GET_DEFAULT_VALUE(s, def) if ((s)==0) {s=(def);}
-
+#define GET_DEFAULT_VALUE_CPYSTR(s, def) if ((s)==0) {s = g_malloc(PATH_MAX);g_stpcpy(s, def);}
+#define SET_DEFAULT_VALUE_CPYSTR(s, def) if ((def)!=0) {GET_DEFAULT_VALUE_CPYSTR(s, def)};
 struct eye_config g_config;
 
 static gboolean verbose = FALSE;
@@ -37,6 +38,10 @@ static GOptionEntry entries[] =
     { "interval", 'i', 0, G_OPTION_ARG_INT, &g_config.interval, "Interval of every rest", "T" },
     { "idle-time", 'd', 0, G_OPTION_ARG_INT, &g_config.max_idle_time, "Idle time", "T" },
     { "rest-time", 'r', 0, G_OPTION_ARG_INT, &g_config.rest_time, "Rest time", "T"},
+    { "font", 'f', 0, G_OPTION_ARG_STRING, &g_config.font, "Display font", "Monospace:size=24"},
+    { "color", 'c', 0, G_OPTION_ARG_STRING, &g_config.color, "Display color", "red"},
+    { "x-coordinate", 'x', 0, G_OPTION_ARG_INT, &g_config.x_coordinate, "X-coordinate (percent)", "50"},
+    { "y-coordinate", 'y', 0, G_OPTION_ARG_INT, &g_config.y_coordinate, "Y-coordinate (percent)", "50"},
     { "verbose", 'v', 0, G_OPTION_ARG_NONE, &verbose, "Be verbose", NULL },
     { NULL }
 };
@@ -73,6 +78,15 @@ static void config_from_file()
         GET_DEFAULT_VALUE(g_config.interval,        g_key_file_get_integer (key_file, "Config", "interval", NULL));
         GET_DEFAULT_VALUE(g_config.rest_time,       g_key_file_get_integer (key_file, "Config", "rest_time", NULL));
         GET_DEFAULT_VALUE(g_config.max_idle_time,   g_key_file_get_integer (key_file, "Config", "max_idle_time", NULL));
+        gchar* font = g_key_file_get_string(key_file, "Display", "font", NULL);
+        gchar* color = g_key_file_get_string(key_file, "Display", "color", NULL);
+        SET_DEFAULT_VALUE_CPYSTR(g_config.font, font);
+        SET_DEFAULT_VALUE_CPYSTR(g_config.color, color);
+        g_free(font);
+        g_free(color);
+
+        GET_DEFAULT_VALUE(g_config.x_coordinate,   g_key_file_get_integer (key_file, "Display", "x-coordinate", NULL));
+        GET_DEFAULT_VALUE(g_config.y_coordinate,   g_key_file_get_integer (key_file, "Display", "y-coordinate", NULL));
     }
     
     g_key_file_free(key_file);
@@ -84,6 +98,12 @@ static void config_set_default()
     GET_DEFAULT_VALUE(g_config.interval,       45*60);
     GET_DEFAULT_VALUE(g_config.rest_time,      3*60);
     GET_DEFAULT_VALUE(g_config.max_idle_time,  5*60);
+
+    GET_DEFAULT_VALUE_CPYSTR(g_config.font, "Monospace:size=28");
+    GET_DEFAULT_VALUE_CPYSTR(g_config.color, "red");
+
+    GET_DEFAULT_VALUE(g_config.x_coordinate,   50);
+    GET_DEFAULT_VALUE(g_config.y_coordinate,   50);
 }
 
 gboolean config_init(int argc, char* argv[])
@@ -97,5 +117,6 @@ gboolean config_init(int argc, char* argv[])
     config_set_default();
 
     g_print("interval = %d\nrest_time= %d\nmax_idle_time = %d\n", g_config.interval, g_config.rest_time, g_config.max_idle_time);
+    g_print("font = %s\ncolor = %s\nx = %d\ny = %d\n", g_config.font, g_config.color, g_config.x_coordinate, g_config.y_coordinate);
     return TRUE;
 }

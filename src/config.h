@@ -27,6 +27,12 @@ struct eye_config
     gint interval;           // 间隔时间
     gint rest_time;          // 每次休息时间
     gint max_idle_time;      // 最长空闲时间，达到后停止计时
+
+    // 显示倒计时
+    gchar* font;             // 使用的字体
+    gchar* color;            // 使用的颜色
+    gint x_coordinate;       // 显示文本的x坐标（文字的中心）
+    gint y_coordinate;       // 显示文本的y坐标（文字的中心）
 };
 
 extern struct eye_config g_config;

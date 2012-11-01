@@ -24,11 +24,7 @@
 #include <string.h>
 
 #include "xlock.h"
-
-
-// TODO:把字体，颜色，位置等放到配置文件中
-
-
+#include "config.h"
 
 typedef struct {
 	int screen;
@@ -122,9 +118,9 @@ static Lock* xlock_lockeachscreen(Display* dpy, int screen)
     //lock->gc = XCreateGC (dpy, lock->win, 0, 0);
     //XSetForeground (dpy, lock->gc, white_pixel); 
     // 创建用于显示剩余时间的字体，颜色等
-    lock->font = XftFontOpenName(dpy, lock->screen, "Monospace:size=24");
+    lock->font = XftFontOpenName(dpy, lock->screen, g_config.font);
     lock->draw = XftDrawCreate(dpy, lock->win, DefaultVisual(dpy, lock->screen), DefaultColormap(dpy, lock->screen));
-    XftColorAllocName(dpy, DefaultVisual(dpy, lock->screen), DefaultColormap(dpy, lock->screen), "red", &lock->color);
+    XftColorAllocName(dpy, DefaultVisual(dpy, lock->screen), DefaultColormap(dpy, lock->screen), g_config.color, &lock->color);
 
 	return lock;
 }
@@ -180,12 +176,12 @@ void xlock_display_time_on_screen(Display* dpy, Lock* lock, int time)
     //XDrawString (dpy, lock->win, lock->gc,
     //        20, 20, time_str, MIN(len, PATH_MAX));
 
-    // 暂时先放到正中间
+    // 计算位置
     XGlyphInfo extents;
     XftTextExtents8 (dpy, lock->font, time_str, MIN(len, PATH_MAX), &extents);
 
-    int x = DisplayWidth(dpy, lock->screen)/2 - extents.width/2 + extents.x;
-    int y = DisplayHeight(dpy, lock->screen)/2 - extents.height/2 + extents.y;
+    int x = DisplayWidth(dpy, lock->screen)*g_config.x_coordinate/100 - extents.width/2 + extents.x;
+    int y = DisplayHeight(dpy, lock->screen)*g_config.y_coordinate/100 - extents.height/2 + extents.y;
 
     XftDrawString8(lock->draw, &lock->color, lock->font, x, y, time_str, MIN(len, PATH_MAX));
     XFlush(dpy);
