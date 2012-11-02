@@ -181,7 +181,10 @@ void xlock_display_time_on_screen(Display* dpy, Lock* lock, time_t time)
     {
         len = strftime(time_str, sizeof(time_str), g_config.format, tm);
     }
-    XClearWindow (dpy, lock->win);
+
+    static int x = 0, y = 0, width = 0, height = 0;
+    //XClearWindow (dpy, lock->win);
+    XClearArea (dpy, lock->win, x, y, width, height, False);
     //XDrawString (dpy, lock->win, lock->gc,
     //        20, 20, time_str, MIN(len, PATH_MAX));
 
@@ -190,10 +193,12 @@ void xlock_display_time_on_screen(Display* dpy, Lock* lock, time_t time)
     XGlyphInfo extents;
     XftTextExtentsUtf8 (dpy, lock->font, time_str, len, &extents);
 
-    int x = DisplayWidth (dpy, lock->screen) * g_config.x_coordinate / 100 - extents.width/2 + extents.x;
-    int y = DisplayHeight(dpy, lock->screen) * g_config.y_coordinate / 100 - extents.height/2 + extents.y;
+    width  = extents.width;
+    height = extents.height;
+    x = DisplayWidth (dpy, lock->screen) * g_config.x_coordinate / 100 - width/2;
+    y = DisplayHeight(dpy, lock->screen) * g_config.y_coordinate / 100 - height/2;
 
-    XftDrawStringUtf8(lock->draw, &lock->color, lock->font, x, y, time_str, len);
+    XftDrawStringUtf8(lock->draw, &lock->color, lock->font, x + extents.x, y + extents.y, time_str, len);
     XFlush(dpy);
 }
 
