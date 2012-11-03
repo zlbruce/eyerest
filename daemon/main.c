@@ -27,10 +27,13 @@
 #include "xevent.h"
 #include "timer.h"
 #include "config.h"
+#include "dbus.h"
+
 
 int main(int argc, char* argv[]) 
 {
     setlocale (LC_ALL, "");
+    g_type_init();
     g_set_application_name ("eyerest-daemon");
 
     if (!config_init(argc, argv))
@@ -43,6 +46,12 @@ int main(int argc, char* argv[])
     {
         daemon(0, 0);
     }
+
+    if(!dbus_init())
+    {
+        g_critical("dbus_init failed!\n");
+    }
+
 
     if (!xevent_init())
     {

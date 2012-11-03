@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<node name="/">
+    <interface name="org.zlbruce.eyerest.basic">
+        <method name="delay">
+            <arg name="time" type="u" direction="in"/>
+        </method>
+        <method name="get_time_remain">
+            <arg name="time" type="u" direction="out"/>
+        </method>
+        <method name="pause">
+        </method>
+        <method name="continue">
+        </method>
+        <signal name="status">
+            <arg name="time_remain" type="u" />
+        </signal>
+    </interface>
+</node>

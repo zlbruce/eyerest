@@ -21,6 +21,7 @@
 #include "xevent.h"
 #include "xlock.h"
 #include "config.h"
+#include "dbus.h"
 
 enum state_e
 {
@@ -155,7 +156,7 @@ void state_timeout_cb(guint time)
 }
 
 // ACTIVE STATE
-static guint s_work_time_left = 0;
+static guint s_work_time_remain = 0;
 static gboolean s_user_pause = FALSE;
 
 void state_active_pause()
@@ -163,9 +164,19 @@ void state_active_pause()
     s_user_pause = TRUE;
 }
 
-void state_active_unpause()
+void state_active_continue()
 {
     s_user_pause = FALSE;
+}
+
+void state_active_delay(guint time)
+{
+    s_work_time_remain += time;
+}
+
+guint state_active_get_time_remain()
+{
+    return s_work_time_remain;
 }
 
 static gboolean state_active_pre_enter(enum state_e from_st)
@@ -175,7 +186,7 @@ static gboolean state_active_pre_enter(enum state_e from_st)
 
 static void state_active_enter(enum state_e from_st)
 {
-    s_work_time_left = g_config.interval;
+    s_work_time_remain = g_config.interval;
 }
 
 
@@ -188,17 +199,20 @@ static void state_active_timeout_cb(guint time)
     // 记录是否有用户空闲
     static guint s_idle_time = 0;
 
-    g_debug("work time left = %d\n", s_work_time_left);
+    g_debug("work time left = %d\n", s_work_time_remain);
+
+
+    dbus_sent_status(s_work_time_remain);
 
     // 判断是否需要进入 idle 状态
-    if(s_work_time_left <= 0)
+    if(s_work_time_remain <= 0)
     {
         state_change(STATE_XLOCK);
     }
 
     if(!s_user_pause)
     {
-        s_work_time_left -= time;
+        s_work_time_remain -= time;
     }
 
     // 判断是否满足进入 idle 状态

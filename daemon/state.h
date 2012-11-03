@@ -29,7 +29,9 @@ void state_timeout_cb(guint time);
 
 // 用于暂停计数
 void state_active_pause();
-void state_active_unpause();
+void state_active_continue();
+void state_active_delay(guint time);
+guint state_active_get_time_remain();
 
 G_END_DECLS
 #endif  /*__STATE_H__*/
