@@ -35,15 +35,6 @@ static gboolean on_handle_delay (
     return TRUE;
 }
 
-static gboolean on_handle_get_time_remain (
-        OrgZlbruceEyerestBasic *object,
-        GDBusMethodInvocation *invocation)
-{
-    guint time = state_active_get_time_remain();
-    org_zlbruce_eyerest_basic_complete_get_time_remain(object, invocation, time);
-
-    return TRUE;
-}
 
 static gboolean on_handle_pause (
         OrgZlbruceEyerestBasic *object,
@@ -65,6 +56,36 @@ static gboolean on_handle_continue (
     return TRUE;
 }
 
+static gboolean on_handle_rest_now(
+        OrgZlbruceEyerestBasic *object,
+        GDBusMethodInvocation *invocation)
+{
+    state_active_rest_now();
+    org_zlbruce_eyerest_basic_complete_rest_now(object, invocation);
+
+    return TRUE;
+}
+
+static gboolean on_handle_get_time_remain (
+        OrgZlbruceEyerestBasic *object,
+        GDBusMethodInvocation *invocation)
+{
+    guint time = state_active_get_time_remain();
+    org_zlbruce_eyerest_basic_complete_get_time_remain(object, invocation, time);
+
+    return TRUE;
+}
+
+static gboolean on_handle_get_state(
+        OrgZlbruceEyerestBasic *object,
+        GDBusMethodInvocation *invocation)
+{
+    const gchar* state = state_get_state_info();
+    org_zlbruce_eyerest_basic_complete_get_state(object, invocation, state);
+
+    return TRUE;
+}
+
 static void on_bus_acquired (GDBusConnection *connection,
         const gchar     *name,
         gpointer         user_data)
@@ -76,16 +97,24 @@ static void on_bus_acquired (GDBusConnection *connection,
             G_CALLBACK (on_handle_delay),
             NULL);
     g_signal_connect (interface,
-            "handle-get-time-remain",
-            G_CALLBACK (on_handle_get_time_remain),
-            NULL);
-    g_signal_connect (interface,
             "handle-pause",
             G_CALLBACK (on_handle_pause),
             NULL);
     g_signal_connect (interface,
             "handle-continue",
             G_CALLBACK (on_handle_continue),
+            NULL);
+    g_signal_connect (interface,
+            "handle-rest-now",
+            G_CALLBACK (on_handle_rest_now),
+            NULL);
+    g_signal_connect (interface,
+            "handle-get-time-remain",
+            G_CALLBACK (on_handle_get_time_remain),
+            NULL);
+    g_signal_connect (interface,
+            "handle-get-state",
+            G_CALLBACK (on_handle_get_state),
             NULL);
 
     GError *error = NULL;
@@ -128,8 +157,8 @@ gboolean dbus_init()
     return TRUE;
 }
 
-void dbus_sent_status(guint time_remain)
+void dbus_sent_status(guint time_remain, const gchar* state)
 {
     g_assert(interface);
-    org_zlbruce_eyerest_basic_emit_status (interface, time_remain);
+    org_zlbruce_eyerest_basic_emit_status (interface, time_remain, state);
 }

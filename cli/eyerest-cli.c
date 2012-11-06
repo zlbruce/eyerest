@@ -24,6 +24,7 @@ static gboolean s_status = FALSE;
 static guint s_delay_time = 0;
 static gboolean s_pause = FALSE;
 static gboolean s_continue = FALSE;
+static gboolean s_rest_now = FALSE;
 
 static GOptionEntry entries[] =
 {
@@ -31,6 +32,7 @@ static GOptionEntry entries[] =
     { "delay", 'd', 0, G_OPTION_ARG_INT, &s_delay_time, "Delay the rest", "T"},
     { "pause", 'p', 0, G_OPTION_ARG_NONE, &s_pause, "Pause counter", NULL},
     { "continue", 'c', 0, G_OPTION_ARG_NONE, &s_continue, "Continue counter", NULL},
+    { "rest-now", 'r', 0, G_OPTION_ARG_NONE, &s_rest_now, "Rest now", NULL},
     { NULL }
 };
 
@@ -51,7 +53,20 @@ static void process_request(OrgZlbruceEyerestBasic* proxy)
             return;
         }
 
+        gchar* st = NULL;
+        error = NULL;
+        if (!org_zlbruce_eyerest_basic_call_get_state_sync (
+                    proxy,
+                    &st,
+                    NULL,
+                    &error))
+        {
+            g_print ("call dbus methed get_state failed: %s\n", error->message);
+            return;
+        }
+
         g_print("time remain: %u\n", out_time);
+        g_print("state:       %s\n", st);
     }
 
     if(s_delay_time != 0)
@@ -90,6 +105,19 @@ static void process_request(OrgZlbruceEyerestBasic* proxy)
                     &error))
         {
             g_print ("call dbus methed continue failed: %s\n", error->message);
+            return;
+        }
+    }
+
+    if(s_rest_now)
+    {
+        error = NULL;
+        if (!org_zlbruce_eyerest_basic_call_rest_now_sync (
+                    proxy,
+                    NULL,
+                    &error))
+        {
+            g_print ("call dbus methed rest_now failed: %s\n", error->message);
             return;
         }
     }

@@ -25,7 +25,7 @@ G_BEGIN_DECLS
 
 gboolean dbus_init();
 
-void dbus_sent_status(guint time_remain);
+void dbus_sent_status(guint time_remain, const gchar* state);
 
 G_END_DECLS
 

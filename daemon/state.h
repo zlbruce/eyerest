@@ -31,7 +31,9 @@ void state_timeout_cb(guint time);
 void state_active_pause();
 void state_active_continue();
 void state_active_delay(guint time);
+void state_active_rest_now();
 guint state_active_get_time_remain();
+const gchar* state_get_state_info();
 
 G_END_DECLS
 #endif  /*__STATE_H__*/

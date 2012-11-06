@@ -34,6 +34,9 @@ enum state_e
 
 struct state_t
 {
+    /* 状态名称
+     */
+    const gchar* name;
     /* 是否可以从from_st进入该状态
      * @param from_st 前一个状态
      * @return TRUE or FALSE
@@ -51,6 +54,10 @@ struct state_t
      * @param time 超时时间
      */
     void (*timeout_cb)(guint time);
+
+    /* 获取简短信息
+     */
+    const gchar* (*get_short_info)();
 };
 
 
@@ -59,6 +66,7 @@ static gboolean state_active_pre_enter(enum state_e from_st);
 static void state_active_enter(enum state_e from_st);
 static void state_active_leave();
 static void state_active_timeout_cb(guint time);
+static const gchar* state_active_get_short_info();
 
 // IDLE STATE
 static gboolean state_idle_pre_enter(enum state_e from_st);
@@ -76,31 +84,39 @@ static struct state_t s_all_st[STATE_MAX] =
 {
     [STATE_INIT] = 
     {
+        .name       = "INIT",
         .pre_enter  = NULL,
         .enter      = NULL,
         .leave      = NULL,
-        .timeout_cb = NULL
+        .timeout_cb = NULL,
+        .get_short_info = NULL
     },
     [STATE_ACTIVE] = 
     {
+        .name       = "ACTIVE",
         .pre_enter  = state_active_pre_enter,
         .enter      = state_active_enter,
         .leave      = state_active_leave,
-        .timeout_cb = state_active_timeout_cb 
+        .timeout_cb = state_active_timeout_cb,
+        .get_short_info = state_active_get_short_info
     },
     [STATE_IDLE] = 
     {
+        .name       = "IDLE",
         .pre_enter  = state_idle_pre_enter,
         .enter      = state_idle_enter,
         .leave      = state_idle_leave,
-        .timeout_cb = state_idle_timeout_cb 
+        .timeout_cb = state_idle_timeout_cb,
+        .get_short_info = NULL
     },
     [STATE_XLOCK] = 
     {
+        .name       = "LOCK",
         .pre_enter  = state_xlock_pre_enter,
         .enter      = state_xlock_enter,
         .leave      = state_xlock_leave,
-        .timeout_cb = state_xlock_timeout_cb 
+        .timeout_cb = state_xlock_timeout_cb,
+        .get_short_info = NULL
     },
 };
 
@@ -109,6 +125,17 @@ static enum state_e s_curret_state = STATE_INIT;
 static struct state_t* get_st(enum state_e st)
 {
     return s_all_st + st;
+}
+
+const gchar* state_get_state_info()
+{
+    struct state_t* curret_st = get_st(s_curret_state);
+    if (curret_st->get_short_info)
+    {
+        return curret_st->get_short_info();
+    }
+
+    return curret_st->name;
 }
 
 static gboolean state_change(enum state_e st)
@@ -148,6 +175,9 @@ void state_timeout_cb(guint time)
     struct state_t* curret_st = get_st(s_curret_state);
 
     g_debug("curret_st = %d\n", s_curret_state);
+    const gchar* st_info = state_get_state_info();
+    guint time_remain = state_active_get_time_remain();
+    dbus_sent_status(time_remain, st_info);
 
     if(curret_st->timeout_cb)
     {
@@ -172,6 +202,11 @@ void state_active_continue()
 void state_active_delay(guint time)
 {
     s_work_time_remain += time;
+}
+
+void state_active_rest_now()
+{
+    s_work_time_remain = 0;
 }
 
 guint state_active_get_time_remain()
@@ -201,10 +236,7 @@ static void state_active_timeout_cb(guint time)
 
     g_debug("work time left = %d\n", s_work_time_remain);
 
-
-    dbus_sent_status(s_work_time_remain);
-
-    // 判断是否需要进入 idle 状态
+    // 判断是否需要进入 lock 状态
     if(s_work_time_remain <= 0)
     {
         state_change(STATE_XLOCK);
@@ -231,6 +263,16 @@ static void state_active_timeout_cb(guint time)
         state_change(STATE_IDLE);
     }
 
+}
+
+static const gchar* state_active_get_short_info()
+{
+    if(s_user_pause)
+    {
+        return "PAUSE";
+    }
+
+    return "ACTIVE";
 }
 
 

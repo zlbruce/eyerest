@@ -10,10 +10,23 @@ eyerest是一款通过定时锁定屏幕，提醒用户休息的小软件
 * 可配置锁屏时屏幕上显示的文字，位置，字体，大小与颜色
 * 提供dbus接口，可以进行暂停，推迟等
 
+###Gnome Shell Extension
+
+附带一个简单的 Gnome Shell 扩展，只在我的 Gnome Shell 3.4.2 中进行过测试。
+
+安装之后会在顶部菜单中增加一个按钮，按钮显示倒计时，点击按钮后弹出一组菜单，用于控制 eyerest-daemon，可以参看截图。
+
+![Gnome Shell Extension Eyerest](http://i.imgur.com/9e6nQ.png)
+
+将源代码目录下的`gnome-shell-extension-eyerest/eyerest@zlbruce.org`整个目录拷贝到`$HOME/.local/share/gnome-shell/extensions/`目录，然后重启 gnome-shell，开启这个扩展即可。
+
 ###TODO
 
 * 增加dbus接口（完成）
-* 根据dbus接口实现：显示剩余时间，休息前提醒，推迟休息等功能
+* 根据dbus接口实现
+ 1. 显示剩余时间（完成）
+ 2. 推迟休息（完成）
+ 3. 休息前提醒
  
 ##编译与运行
 

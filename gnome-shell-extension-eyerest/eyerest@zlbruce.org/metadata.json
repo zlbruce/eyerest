@@ -1,0 +1,7 @@
+{
+    "shell-version": ["3.4.2"], 
+    "uuid": "eyerest@zlbruce.org", 
+    "name": "eyerest", 
+    "description": "eyerest control", 
+    "url": "http://eyerest.zlbruce.org/"
+}

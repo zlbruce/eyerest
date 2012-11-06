@@ -45,12 +45,13 @@ static void xlock_unlockeachscreen(Display *dpy, Lock *lock)
 		return;
 
 //    XFreeGC (dpy, lock->gc);
+	XUngrabPointer(dpy, CurrentTime);
+    XUngrabKeyboard(dpy, CurrentTime);
     
     XftColorFree (dpy, DefaultVisual(dpy, lock->screen), DefaultColormap(dpy, lock->screen), &lock->color);
     XftDrawDestroy (lock->draw);
 
 
-	XUngrabPointer(dpy, CurrentTime);
 	XFreePixmap(dpy, lock->pmap);
 	XDestroyWindow(dpy, lock->win);
 
@@ -156,7 +157,7 @@ void xlock_unlockscreen()
 {
     int nscreens = ScreenCount(s_dpy);
     int i;
-	for(i = 1; i < nscreens; i++)
+	for(i = 0; i < nscreens; i++)
     {
 		xlock_unlockeachscreen(s_dpy, s_locks[i]);
     }
