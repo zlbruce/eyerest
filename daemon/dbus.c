@@ -119,9 +119,9 @@ static void on_bus_acquired (GDBusConnection *connection,
 
     GError *error = NULL;
     if (!g_dbus_interface_skeleton_export (G_DBUS_INTERFACE_SKELETON (interface),
-            connection,
-            "/",
-            &error))
+                connection,
+                "/",
+                &error))
     {
         g_warning("g_dbus_interface_skeleton_export failed: %s", error->message);
     }
@@ -153,7 +153,7 @@ gboolean dbus_init()
             on_name_lost,
             NULL,
             NULL);
-    
+
     return TRUE;
 }
 

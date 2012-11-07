@@ -96,7 +96,7 @@ static void config_from_file()
         GET_DEFAULT_VALUE(g_config.x_coordinate,   g_key_file_get_integer (key_file, "Display", "x-coordinate", NULL));
         GET_DEFAULT_VALUE(g_config.y_coordinate,   g_key_file_get_integer (key_file, "Display", "y-coordinate", NULL));
     }
-    
+
     g_key_file_free(key_file);
     g_string_free(path, TRUE);
 }

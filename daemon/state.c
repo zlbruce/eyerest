@@ -35,7 +35,7 @@ enum state_e
 struct state_t
 {
     /* 状态名称
-     */
+    */
     const gchar* name;
     /* 是否可以从from_st进入该状态
      * @param from_st 前一个状态
@@ -47,7 +47,7 @@ struct state_t
      */
     void (*enter)(enum state_e from_st);
     /* 退出该状态
-     */
+    */
     void (*leave)();
 
     /* 定时超时回调
@@ -56,7 +56,7 @@ struct state_t
     void (*timeout_cb)(guint time);
 
     /* 获取简短信息
-     */
+    */
     const gchar* (*get_short_info)();
 };
 
