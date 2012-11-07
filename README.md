@@ -61,6 +61,6 @@ eyerest是一款通过定时锁定屏幕，提醒用户休息的小软件
 
 离休息时间还剩 1 分钟时会进行提示，如图：
 
-![Gnome Shell Extension Eyerest Notify](http://i.imgur.com/oV3DG.png)
+![Gnome Shell Extension Eyerest Notify](http://i.imgur.com/olRwd.png)
 
 将源代码目录下的`gnome-shell-extension-eyerest/eyerest@zlbruce.org`整个目录拷贝到`$HOME/.local/share/gnome-shell/extensions/`目录，然后重启 gnome-shell，开启这个扩展即可。
