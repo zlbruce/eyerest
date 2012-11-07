@@ -15,6 +15,8 @@ const N_ = function(t) { return t };
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const dbus_interface = Me.imports.dbus;
 
+// 提前1分钟提醒
+const TIME_TO_NOTIFY = 60;
 
 let eye_button;
 
@@ -26,20 +28,29 @@ const eyerest_button = new Lang.Class({
 
     _init : function() 
     {
-        this.parent(0.0, 'eyerest');
+        this.parent(0.0, 'Eyerest');
 
-        this._label = new St.Label({ style_class: 'panel-label', text: _("eyerest") });
+        this._message_source = null;
+        this._message_notification = null;
+        this._message_label = null;
+
+        this._isNotified = false;
+
+        this._label = new St.Label({ style_class: 'panel-label', text: "Eyerest" });
         this.actor.add_actor(this._label);
 
         // 添加菜单
-        this._state_title = new PopupMenu.PopupMenuItem(_('State:'), { reactive: false });
-        this._delay3_menu = new PopupMenu.PopupMenuItem(_('delay 3 min'));
-        this._delay5_menu = new PopupMenu.PopupMenuItem(_('delay 5 min'));
+        this._state_title = new PopupMenu.PopupMenuItem(_("State: "), { reactive: false });
+        this._delay3_menu = new PopupMenu.PopupMenuItem(_("delay 3 min"));
+        this._delay5_menu = new PopupMenu.PopupMenuItem(_("delay 5 min"));
 
-        this._pause_menu = new PopupMenu.PopupMenuItem(_('pause'));
-        this._continue_menu = new PopupMenu.PopupMenuItem(_('continue'));
+        this._pause_menu = new PopupMenu.PopupMenuItem(_("pause"));
+        this._continue_menu = new PopupMenu.PopupMenuItem(_("continue"));
 
-        this._rest_now_menu = new PopupMenu.PopupMenuItem(_('rest now'));
+        this._rest_now_menu = new PopupMenu.PopupMenuItem(_("rest now"));
+
+        // 测试用的菜单
+        //this._test_notify_menu = new PopupMenu.PopupMenuItem(_("notify"));
 
         this.menu.addMenuItem(this._state_title);
 
@@ -51,6 +62,9 @@ const eyerest_button = new Lang.Class({
         this.menu.addMenuItem(this._pause_menu);
         this.menu.addMenuItem(this._continue_menu);
         this.menu.addMenuItem(this._rest_now_menu);
+
+        //this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+        //this.menu.addMenuItem(this._test_notify_menu);
 
         // 菜单事件
         this._delay3_menu.connect('activate', Lang.bind(this, this._delay_seconds, 180));
@@ -68,22 +82,47 @@ const eyerest_button = new Lang.Class({
                 this._eyerest_proxy.rest_nowRemote();
             }));
 
+        //this._test_notify_menu.connect('activate', Lang.bind(this, this._notify_time));
+
         // Dbus
         this._eyerest_proxy = dbus_interface.eyerest_dbus();
         this._eyerest_proxy.connectSignal('status', Lang.bind(this, this._on_status_change));
+
     },
 
     _on_status_change : function(proxy, sender, [time_remain, st])
     {
-        // TODO: 格式化字符串
+        // 格式化字符串
         let tm = new Date(time_remain * 1000);
         let tm_utc = convertDateToUTC(tm);
         let tm_string = tm_utc.toLocaleFormat("%M:%S");
         this._label.text = tm_string;
-        this._state_title.label.text = _('State:') + ' ' + st;
+        this._state_title.label.text = _("State: ") + st;
 
-        // TODO: 提醒
+        // 提醒
+        if (time_remain < TIME_TO_NOTIFY)
+        {
+            if (!this._isNotified && this._message_source == null)
+                this._notify_time();
 
+            this._isNotified = true;
+        }
+        else
+        {
+            if (this._message_source != null)
+            {
+                this._message_notification.destroy();
+                this._message_source.destroy();
+
+                this._message_source = null;
+                this._message_notification = null;
+                this._message_label = null;
+            }
+            this._isNotified = false;
+        }
+
+        if(this._message_label != null)
+            this._message_label.text = _("It's time for a break ") + tm_string;
     },
 
     _delay_seconds: function(menuItem, event, sec)
@@ -91,19 +130,53 @@ const eyerest_button = new Lang.Class({
         this._eyerest_proxy.delayRemote(sec);
     },
 
+    _notify_time: function()
+    {
+        // Source
+        this._message_source = new MessageTray.SystemNotificationSource();
+        this._message_source.setTitle('Eyerest');
+        this._message_source.connect('destroy', Lang.bind(this, this._on_message_source_destroy));
+        Main.messageTray.add(this._message_source);
+
+        // Notification
+        this._message_notification = new MessageTray.Notification(this._message_source, "Eyerest", _("It's time for a break "), {customContent:true});
+        this._message_notification.addButton(1, _("I Know"));
+        this._message_notification.addButton(2, _("delay 3 min"));
+        this._message_label = this._message_notification.addBody(this._label.text);
+
+        this._message_notification.connect('action-invoked', Lang.bind(this, this._on_message_button_click));
+        this._message_source.notify(this._message_notification);
+    },
+
+    _on_message_button_click: function(notification, id)
+    {
+        if ( id == 2 )
+            this._eyerest_proxy.delayRemote(180);
+    },
+
+    _on_message_source_destroy: function(notification, reason)
+    {
+        this._message_source = null;
+        this._message_notification = null;
+        this._message_label = null;
+    },
+
 });
 
 
 
-function init() {
+function init() 
+{
     let localeDir = Me.dir.get_child('locale').get_path();
 
     // Extension installed in .local
-    if (GLib.file_test(localeDir, GLib.FileTest.EXISTS)) {
+    if (GLib.file_test(localeDir, GLib.FileTest.EXISTS)) 
+    {
         imports.gettext.bindtextdomain('gnome-shell-extensions-eyerest', localeDir);
     }
     // Extension installed system-wide
-    else {
+    else 
+    {
         imports.gettext.bindtextdomain('gnome-shell-extensions-eyerest', Me.metadata.locale);
     }
 }
