@@ -6,6 +6,7 @@ const PopupMenu = imports.ui.popupMenu;
 const PanelMenu = imports.ui.panelMenu;
 const MessageTray = imports.ui.messageTray;
 const GLib = imports.gi.GLib;
+const Shell = imports.gi.Shell;
 
 const Gettext = imports.gettext.domain('gnome-shell-extensions-eyerest');
 const _ = Gettext.gettext;
@@ -15,9 +16,6 @@ const N_ = function(t) { return t };
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const dbus_interface = Me.imports.dbus;
 const Util = Me.imports.util;
-
-// 提前1分钟提醒
-const TIME_TO_NOTIFY = 60;
 
 let eye_button;
 let settings;
@@ -51,6 +49,7 @@ const eyerest_button = new Lang.Class({
 
         this._rest_now_menu = new PopupMenu.PopupMenuItem(_("rest now"));
 
+        this._pref_menu = new PopupMenu.PopupMenuItem(_("Preferences..."));
         // 测试用的菜单
         //this._test_notify_menu = new PopupMenu.PopupMenuItem(_("notify"));
 
@@ -64,6 +63,9 @@ const eyerest_button = new Lang.Class({
         this.menu.addMenuItem(this._pause_menu);
         this.menu.addMenuItem(this._continue_menu);
         this.menu.addMenuItem(this._rest_now_menu);
+
+        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+        this.menu.addMenuItem(this._pref_menu);
 
         //this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         //this.menu.addMenuItem(this._test_notify_menu);
@@ -90,6 +92,18 @@ const eyerest_button = new Lang.Class({
         this._eyerest_proxy = dbus_interface.eyerest_dbus();
         this._eyerest_proxy.connectSignal('status', Lang.bind(this, this._on_status_change));
 
+        this._gsmPrefs = Shell.AppSystem.get_default().lookup_app('gnome-shell-extension-prefs.desktop');
+
+        this._pref_menu.connect('activate', Lang.bind(this, function () 
+            {
+                if (this._gsmPrefs.get_state() == this._gsmPrefs.SHELL_APP_STATE_RUNNING){
+                    this._gsmPrefs.activate();
+                } else {
+                    this._gsmPrefs.launch(global.display.get_current_time_roundtrip(),
+                        [Me.metadata.uuid],-1,null);
+                }
+            }));
+
     },
 
     _on_status_change : function(proxy, sender, [time_remain, st])
@@ -111,15 +125,7 @@ const eyerest_button = new Lang.Class({
         }
         else
         {
-            if (this._message_source != null)
-            {
-                this._message_notification.destroy();
-                this._message_source.destroy();
-
-                this._message_source = null;
-                this._message_notification = null;
-                this._message_label = null;
-            }
+            this._destroy_message_notify();
             this._isNotified = false;
         }
 
@@ -137,7 +143,10 @@ const eyerest_button = new Lang.Class({
         // Source
         this._message_source = new MessageTray.SystemNotificationSource();
         this._message_source.setTitle('Eyerest');
-        this._message_source.connect('destroy', Lang.bind(this, this._on_message_source_destroy));
+        this._message_source.connect('destroy', Lang.bind(this, function(notification, reason)
+            {
+                this._clear_message_notify();
+            }));
         Main.messageTray.add(this._message_source);
 
         // Notification
@@ -156,11 +165,28 @@ const eyerest_button = new Lang.Class({
             this._eyerest_proxy.delayRemote(180);
     },
 
-    _on_message_source_destroy: function(notification, reason)
+    _clear_message_notify: function()
     {
         this._message_source = null;
         this._message_notification = null;
         this._message_label = null;
+    },
+
+    _destroy_message_notify: function()
+    {
+        if (this._message_source != null)
+        {
+            this._message_notification.destroy();
+            this._message_source.destroy();
+
+            this._clear_message_notify();
+        }
+    },
+
+    destroy: function()
+    {
+        this._destroy_message_notify();
+        this.parent();
     },
 
 });

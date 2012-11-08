@@ -28,6 +28,7 @@
 #include "timer.h"
 #include "config.h"
 #include "dbus.h"
+#include "state.h"
 
 
 int main(int argc, char* argv[]) 

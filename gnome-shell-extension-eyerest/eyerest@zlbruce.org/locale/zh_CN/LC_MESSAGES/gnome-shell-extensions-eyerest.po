@@ -1,22 +1,22 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the Eyerest package.
+# This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # zlbruce <zhangleibruce@gmail.com>, 2012.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: 0.0.1\n"
+"Project-Id-Version: v0.0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-08 15:43+0800\n"
-"PO-Revision-Date: 2012-11-08 15:59+0800\n"
+"POT-Creation-Date: 2012-11-08 23:05+0800\n"
+"PO-Revision-Date: 2012-11-08 23:07+0800\n"
 "Last-Translator: zlbruce <zhangleibruce@gmail.com>\n"
 "Language-Team: 汉语 <>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: extension.js:31 extension.js:35
 msgid "eyerest"
@@ -27,7 +27,7 @@ msgid "State:"
 msgstr "状态："
 
 #: extension.js:36 extension.js:40 extension.js:125 extension.js:44
-#: extension.js:133 extension.js:46 extension.js:146
+#: extension.js:133 extension.js:46 extension.js:146 extension.js:156
 msgid "delay 3 min"
 msgstr "推迟3分钟"
 
@@ -51,15 +51,17 @@ msgstr "立即休息"
 msgid "notify"
 msgstr "消息测试"
 
-#: extension.js:124 extension.js:132 extension.js:145
+#: extension.js:124 extension.js:132 extension.js:145 extension.js:155
 msgid "I Know"
 msgstr "知道了"
 
 #: extension.js:43 extension.js:100 extension.js:45 extension.js:102
+#: extension.js:116
 msgid "State: "
 msgstr "状态： "
 
-#: extension.js:114 extension.js:127 extension.js:144
+#: extension.js:114 extension.js:127 extension.js:144 extension.js:133
+#: extension.js:154
 msgid "It's time for a break "
 msgstr "休息时间到啦 "
 
@@ -70,3 +72,7 @@ msgstr "顶部菜单文本格式"
 #: prefs.js:20
 msgid "Notify time before lock the screen"
 msgstr "提前通知的时间"
+
+#: extension.js:52
+msgid "Preferences..."
+msgstr "首选项..."

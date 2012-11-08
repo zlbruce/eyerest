@@ -31,8 +31,6 @@
 #define SET_DEFAULT_VALUE_CPYSTR(s, def) if ((def)!=0) {GET_DEFAULT_VALUE_CPYSTR(s, def)};
 struct eye_config g_config;
 
-static gboolean verbose = FALSE;
-
 static GOptionEntry entries[] =
 {
     { "interval", 'i', 0, G_OPTION_ARG_INT, &g_config.interval, "Interval of every rest", "T" },

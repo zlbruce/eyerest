@@ -15,6 +15,8 @@
  *
  * =====================================================================================
  */
+#include <unistd.h>
+
 #include <X11/keysym.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -192,14 +194,14 @@ void xlock_display_time_on_screen(Display* dpy, Lock* lock, time_t time)
     // 计算位置
     len = MIN(len, sizeof(time_str));
     XGlyphInfo extents;
-    XftTextExtentsUtf8 (dpy, lock->font, time_str, len, &extents);
+    XftTextExtentsUtf8 (dpy, lock->font, (const FcChar8*)time_str, len, &extents);
 
     width  = extents.width;
     height = extents.height;
     x = DisplayWidth (dpy, lock->screen) * g_config.x_coordinate / 100 - width/2;
     y = DisplayHeight(dpy, lock->screen) * g_config.y_coordinate / 100 - height/2;
 
-    XftDrawStringUtf8(lock->draw, &lock->color, lock->font, x + extents.x, y + extents.y, time_str, len);
+    XftDrawStringUtf8(lock->draw, &lock->color, lock->font, x + extents.x, y + extents.y, (const FcChar8*)time_str, len);
     XFlush(dpy);
 }
 

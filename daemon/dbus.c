@@ -154,7 +154,7 @@ gboolean dbus_init()
             NULL,
             NULL);
 
-    return TRUE;
+    return owner_id > 0;
 }
 
 void dbus_sent_status(guint time_remain, const gchar* state)

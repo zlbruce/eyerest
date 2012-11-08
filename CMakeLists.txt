@@ -1,4 +1,10 @@
 cmake_minimum_required (VERSION 2.8)
 project (eyerest)
+
+set(CMAKE_C_FLAGS "-Wall ${CMAKE_C_FLAGS}")
+set(CMAKE_CXX_FLAGS "-Wall ${CMAKE_CXX_FLAGS}")
+set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--as-needed ${CMAKE_SHARED_LINKER_FLAGS}")
+set(CMAKE_MODULE_LINKER_FLAGS "-Wl,--as-needed ${CMAKE_MODULE_LINKER_FLAGS}")
+
 ADD_SUBDIRECTORY(daemon)
 ADD_SUBDIRECTORY(cli)

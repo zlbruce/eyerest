@@ -87,7 +87,7 @@ static gpointer xevent_thread_fuc(gpointer ctx)
 // 运行监听线程
 void xevent_run()
 {
-    GThread *thread = g_thread_new("xevent", xevent_thread_fuc, NULL);
+    g_thread_new("xevent", xevent_thread_fuc, NULL);
 }
 
 // 停止监听线程
