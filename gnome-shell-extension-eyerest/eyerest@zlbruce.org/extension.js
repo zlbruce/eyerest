@@ -14,11 +14,13 @@ const N_ = function(t) { return t };
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const dbus_interface = Me.imports.dbus;
+const Util = Me.imports.util;
 
 // 提前1分钟提醒
 const TIME_TO_NOTIFY = 60;
 
 let eye_button;
+let settings;
 
 function convertDateToUTC(date) { return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds()); }
 
@@ -95,12 +97,12 @@ const eyerest_button = new Lang.Class({
         // 格式化字符串
         let tm = new Date(time_remain * 1000);
         let tm_utc = convertDateToUTC(tm);
-        let tm_string = tm_utc.toLocaleFormat("%M:%S");
+        let tm_string = tm_utc.toLocaleFormat(settings.get_string('formatstring'));
         this._label.text = tm_string;
         this._state_title.label.text = _("State: ") + st;
 
         // 提醒
-        if (time_remain < TIME_TO_NOTIFY)
+        if (time_remain < settings.get_int('notifytime'))
         {
             if (!this._isNotified && this._message_source == null)
                 this._notify_time();
@@ -167,18 +169,8 @@ const eyerest_button = new Lang.Class({
 
 function init() 
 {
-    let localeDir = Me.dir.get_child('locale').get_path();
-
-    // Extension installed in .local
-    if (GLib.file_test(localeDir, GLib.FileTest.EXISTS)) 
-    {
-        imports.gettext.bindtextdomain('gnome-shell-extensions-eyerest', localeDir);
-    }
-    // Extension installed system-wide
-    else 
-    {
-        imports.gettext.bindtextdomain('gnome-shell-extensions-eyerest', Me.metadata.locale);
-    }
+    Util.initTranslations(Me);
+    settings = Util.getSettings(Me);
 }
 
 function enable() {

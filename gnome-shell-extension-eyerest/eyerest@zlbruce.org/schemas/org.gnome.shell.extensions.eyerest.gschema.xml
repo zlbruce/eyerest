@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="gnome-shell-extensions-eyerest">
+  <schema path="/org/gnome/shell/extensions/eyerest/" id="org.gnome.shell.extensions.eyerest">
+    <key type="s" name="formatstring">
+        <default>"%M:%S"</default>
+        <summary>Display format in the panel menu</summary>
+        <description>Display format in the panel menu.</description>
+    </key>
+    <key type="i" name="notifytime">
+        <default>60</default>
+        <summary>Notify time before lock the screen</summary>
+        <description>Notify time before lock the screen.</description>
+    </key>
+  </schema>
+</schemalist>
