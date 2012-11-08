@@ -16,7 +16,7 @@ eyerest是一款通过定时锁定屏幕，提醒用户休息的小软件
 * 根据dbus接口实现
  1. 显示剩余时间（完成）
  2. 推迟休息（完成）
- 3. 休息前提醒
+ 3. 休息前提醒（完成）
  
 ##编译与运行
 
@@ -37,7 +37,7 @@ eyerest是一款通过定时锁定屏幕，提醒用户休息的小软件
 
 如果想安装，也可以执行：
 
-    make install
+    sudo make install
 
 安装文件如下：
 
@@ -55,9 +55,11 @@ eyerest是一款通过定时锁定屏幕，提醒用户休息的小软件
 
 附带一个简单的 Gnome Shell 扩展，只在我的 Gnome Shell 3.4.2 中进行过测试。
 
+将源代码目录下的`gnome-shell-extension-eyerest/eyerest@zlbruce.org`整个目录拷贝到`$HOME/.local/share/gnome-shell/extensions/`目录，然后重启 gnome-shell（Alt + F2，然后输入 r 回车），开启这个扩展即可（使用gnome-tweak-tool 或者 gnome-shell-extension-tool）。
+
 安装之后会在顶部菜单中增加一个按钮，按钮显示倒计时，点击按钮后弹出一组菜单，用于控制 eyerest-daemon，可以参看截图。
 
-![Gnome Shell Extension Eyerest Menu](http://i.imgur.com/oV3DG.png)
+![Gnome Shell Extension Eyerest Menu](http://i.imgur.com/yViv8.png)
 
 离休息时间还剩 1 分钟时会进行提示，如图：
 
@@ -67,4 +69,3 @@ eyerest是一款通过定时锁定屏幕，提醒用户休息的小软件
 
 ![Gnome Shell Extension Eyerest Pref](http://i.imgur.com/P2DWq.png)
 
-将源代码目录下的`gnome-shell-extension-eyerest/eyerest@zlbruce.org`整个目录拷贝到`$HOME/.local/share/gnome-shell/extensions/`目录，然后重启 gnome-shell，开启这个扩展即可。
