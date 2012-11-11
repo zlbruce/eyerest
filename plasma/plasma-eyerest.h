@@ -10,6 +10,8 @@
 #include <QDBusInterface>
 #include <QString>
 
+#include "ui_eyerest-config.h"
+
 #include "eyerest_dbus.h"
 
 class QSizeF;
@@ -33,7 +35,9 @@ public:
         //void paintInterface(QPainter *p,
         //        const QStyleOptionGraphicsItem *option,
         //        const QRect& contentsRect);
-        void init();
+        virtual void init();
+
+        virtual void createConfigurationInterface(KConfigDialog* parent);
 
         QList<QAction*>  contextualActions ();
 
@@ -49,6 +53,11 @@ private:
 
         void send_notification();
 
+        // config
+        Ui::Config m_config;
+        QString m_format;
+        uint m_notify_time;
+
 private Q_SLOTS: 
         void on_status_change(uint time_remain, const QString state);
         void on_delay(int time);
@@ -57,6 +66,8 @@ private Q_SLOTS:
         void on_rest_now();
         void on_notify_close(uint id, uint reason);
         void on_notify_action_invoked(uint id, QString action_key);
+
+        void on_config_accepted();
 };
 
 #endif

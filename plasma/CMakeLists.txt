@@ -12,6 +12,8 @@ include_directories(
 # We add our source code here
 set(eyerest_SRCS plasma-eyerest.cpp)
 qt4_add_dbus_interface(eyerest_SRCS ${PROJECT_SOURCE_DIR}/eyerest-dbus.xml eyerest_dbus)
+
+kde4_add_ui_files(eyerest_SRCS eyerest-config.ui)
  
 # Now make sure all files get to the right place
 kde4_add_plugin(plasma_applet_eyerest ${eyerest_SRCS})

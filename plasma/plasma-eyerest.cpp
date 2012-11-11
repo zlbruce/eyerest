@@ -5,6 +5,7 @@
 #include <QSizeF>
 #include <QAction>
 #include <QTime>
+#include <KConfigDialog>
 #include <QGraphicsLinearLayout>
  
 #include <plasma/theme.h>
@@ -12,10 +13,6 @@
 #include <plasma/widgets/label.h>
 #include <plasma/widgets/pushbutton.h>
 
-namespace 
-{
-    const uint NOTIFY_TIME = 60;
-}
 
 PlasmaEyerest::PlasmaEyerest(QObject *parent, const QVariantList &args)
     : Plasma::PopupApplet(parent, args),
@@ -103,6 +100,10 @@ QList<QAction*> PlasmaEyerest::contextualActions()
 
 void PlasmaEyerest::init()
 {
+    KConfigGroup cg = config();
+
+    m_format = cg.readEntry("format", "mm:ss");
+    m_notify_time = cg.readEntry("notify_time", 60);
 
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(this);
     layout->setOrientation(Qt::Vertical); //so widgets will be stacked up/down
@@ -165,18 +166,13 @@ void PlasmaEyerest::init()
 void PlasmaEyerest::on_status_change(uint time_remain, const QString state)
 {
     QTime tm = QTime().addSecs(time_remain);
-    m_label->setText(tm.toString("mm:ss"));
+    m_label->setText(tm.toString(m_format));
     if(m_menu_state)
     {
         m_menu_state->setText("State: " + state);
     }
 
-    if(state != "ACTIVE")
-    {
-        return;
-    }
-
-    if(time_remain < NOTIFY_TIME)
+    if(time_remain < m_notify_time)
     {
         if(!m_notified)
             send_notification();
@@ -221,7 +217,7 @@ void PlasmaEyerest::send_notification()
   args.append(m_label->text()); // body
   args.append(QStringList() << "1" << "I Know" << "2" << "Delay 3 min"); // actions - (key,action)
   args.append(QVariantMap()); // hints - unused atm
-  args.append(NOTIFY_TIME * 1000); // expire timout
+  args.append(m_notify_time * 1000); // expire timout
 
   QDBusReply<uint> reply = m_notify_proxy->callWithArgumentList(QDBus::AutoDetect, "Notify", args);
 
@@ -234,8 +230,7 @@ void PlasmaEyerest::send_notification()
 
 void PlasmaEyerest::on_notify_close(uint id, uint reason)
 {
-    //Q_UNUSED(reason);
-    printf("id = %u, reason = %u\n", id, reason);
+    Q_UNUSED(reason);
     // 只处理我们发出去的消息通知
     if(id == m_notify_id)
     {
@@ -251,6 +246,36 @@ void PlasmaEyerest::on_notify_action_invoked(uint id, QString action_key)
         m_eye_proxy->delay(180);
     }
 }
+
+void PlasmaEyerest::createConfigurationInterface(KConfigDialog* parent)
+{
+    QWidget *widget = new QWidget();
+    m_config.setupUi(widget);
+
+    m_config.format->setText(m_format);
+    m_config.notify_time->setValue(m_notify_time);
+
+    parent->addPage(widget, i18n("Eyerest"), "eyerest");
+
+    connect(parent, SIGNAL(applyClicked()), this, SLOT(on_config_accepted()));
+    connect(parent, SIGNAL(okClicked()), this, SLOT(on_config_accepted()));
+
+    connect(m_config.format, SIGNAL(textChanged(QString)), parent, SLOT(settingsModified()));
+    connect(m_config.notify_time, SIGNAL(valueChanged(int)), parent, SLOT(settingsModified()));
+}
+
+void PlasmaEyerest::on_config_accepted()
+{
+    KConfigGroup cg = config();
+
+    m_format = m_config.format->text();
+    m_notify_time = m_config.notify_time->value();
+
+    cg.writeEntry("format", m_format);
+    cg.writeEntry("notify_time", m_notify_time);
+}
+
+
 // This is the command that links your applet to the .desktop file
 K_EXPORT_PLASMA_APPLET(eyerest, PlasmaEyerest)
 
