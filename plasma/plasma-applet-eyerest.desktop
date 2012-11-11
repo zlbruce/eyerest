@@ -1,0 +1,16 @@
+[Desktop Entry]
+Name=Eyerest
+Comment=Eyerest Control
+Type=Service
+ServiceTypes=Plasma/Applet
+ 
+X-KDE-Library=plasma_applet_eyerest
+X-KDE-PluginInfo-Name=eyerest
+X-KDE-PluginInfo-Category=Date and Time
+X-KDE-PluginInfo-Author=zlbruce
+X-KDE-PluginInfo-Email=zhangleibruce@gmail.com
+X-KDE-PluginInfo-Version=0.0.1
+X-KDE-PluginInfo-Website=http://eyerest.zlbruce.org/
+X-KDE-PluginInfo-Depends=
+X-KDE-PluginInfo-License=GPL
+X-KDE-PluginInfo-EnabledByDefault=true

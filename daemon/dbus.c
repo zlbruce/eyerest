@@ -46,7 +46,7 @@ static gboolean on_handle_pause (
     return TRUE;
 }
 
-static gboolean on_handle_continue (
+static gboolean on_handle_unpause(
         OrgZlbruceEyerestBasic *object,
         GDBusMethodInvocation *invocation)
 {
@@ -101,8 +101,8 @@ static void on_bus_acquired (GDBusConnection *connection,
             G_CALLBACK (on_handle_pause),
             NULL);
     g_signal_connect (interface,
-            "handle-continue",
-            G_CALLBACK (on_handle_continue),
+            "handle-unpause",
+            G_CALLBACK (on_handle_unpause),
             NULL);
     g_signal_connect (interface,
             "handle-rest-now",

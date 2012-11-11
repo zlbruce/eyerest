@@ -8,3 +8,9 @@ set(CMAKE_MODULE_LINKER_FLAGS "-Wl,--as-needed ${CMAKE_MODULE_LINKER_FLAGS}")
 
 ADD_SUBDIRECTORY(daemon)
 ADD_SUBDIRECTORY(cli)
+
+find_package(KDE4)
+
+if (KDE4_FOUND)
+    ADD_SUBDIRECTORY(plasma)
+endif(KDE4_FOUND)
