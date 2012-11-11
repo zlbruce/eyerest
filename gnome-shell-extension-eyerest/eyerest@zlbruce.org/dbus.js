@@ -6,7 +6,7 @@ const eyerest_interface = <interface name="org.zlbruce.eyerest.basic">
     </method>
     <method name="pause">
     </method>
-    <method name="continue">
+    <method name="unpause">
     </method>
     <method name="rest_now">
     </method>

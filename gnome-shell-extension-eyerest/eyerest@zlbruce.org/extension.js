@@ -79,7 +79,7 @@ const eyerest_button = new Lang.Class({
             }));
         this._continue_menu.connect('activate', Lang.bind(this, function()
             {
-                this._eyerest_proxy.continueRemote();
+                this._eyerest_proxy.unpauseRemote();
             }));
         this._rest_now_menu.connect('activate', Lang.bind(this, function()
             {

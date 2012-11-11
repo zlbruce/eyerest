@@ -99,7 +99,7 @@ static void process_request(OrgZlbruceEyerestBasic* proxy)
     if(s_continue)
     {
         error = NULL;
-        if (!org_zlbruce_eyerest_basic_call_continue_sync (
+        if (!org_zlbruce_eyerest_basic_call_unpause_sync (
                     proxy,
                     NULL,
                     &error))

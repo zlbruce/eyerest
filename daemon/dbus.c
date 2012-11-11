@@ -51,7 +51,7 @@ static gboolean on_handle_continue (
         GDBusMethodInvocation *invocation)
 {
     state_active_continue();
-    org_zlbruce_eyerest_basic_complete_continue(object, invocation);
+    org_zlbruce_eyerest_basic_complete_unpause(object, invocation);
 
     return TRUE;
 }
