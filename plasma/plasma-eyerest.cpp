@@ -6,6 +6,7 @@
 #include <QAction>
 #include <QTime>
 #include <KConfigDialog>
+#include <KGlobalSettings>
 #include <QGraphicsLinearLayout>
  
 #include <plasma/theme.h>
@@ -15,17 +16,21 @@
 
 
 PlasmaEyerest::PlasmaEyerest(QObject *parent, const QVariantList &args)
-    : Plasma::PopupApplet(parent, args),
-    m_label(NULL),
+    : Plasma::Applet(parent, args),
+    //m_label(NULL),
+    m_time_text("Eyerest"),
     m_menu_state(NULL),
     m_eye_proxy(NULL),
     m_notify_proxy(NULL),
     m_notify_id(0),
-    m_notified(true)
+    m_notified(true),
+    m_font(KGlobalSettings::generalFont()),
+    m_color(Plasma::Theme::defaultTheme()->color(Plasma::Theme::TextColor))
 {
     // this will get us the standard applet background, for free!
     setBackgroundHints(DefaultBackground);
-    resize(200, 100);
+    setHasConfigurationInterface(true);
+    resize(250, 100);
 }
 
 
@@ -104,15 +109,8 @@ void PlasmaEyerest::init()
 
     m_format = cg.readEntry("format", "mm:ss");
     m_notify_time = cg.readEntry("notify_time", 60);
-
-    QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(this);
-    layout->setOrientation(Qt::Vertical); //so widgets will be stacked up/down
-
-    m_label = new Plasma::Label(this);
-    m_label->setText("eyerest");
-
-
-    layout->addItem(m_label);
+    m_font = cg.readEntry("font", m_font);
+    m_color = cg.readEntry("color", m_color);
 
     m_eye_proxy = new org::zlbruce::eyerest::basic("org.zlbruce.eyerest",
             "/",
@@ -143,30 +141,61 @@ void PlasmaEyerest::init()
             SLOT(on_notify_action_invoked(uint, QString)));
 } 
 
+void PlasmaEyerest::prepare_font(QFont &font, QRect &rect, const QString &text)
+{
+    QRect tmpRect;
+    bool first = true;
 
-//void PlasmaEyerest::paintInterface(QPainter *p,
-//        const QStyleOptionGraphicsItem *option, const QRect &contentsRect)
-//{
-//    p->setRenderHint(QPainter::SmoothPixmapTransform);
-//    p->setRenderHint(QPainter::Antialiasing);
-//
-//    // Now we draw the applet, starting with our svg
-//    m_svg.resize((int)contentsRect.width(), (int)contentsRect.height());
-//    m_svg.paint(p, (int)contentsRect.left(), (int)contentsRect.top());
-//
-//    // We place the icon and text
-//    p->drawPixmap(7, 0, m_icon.pixmap((int)contentsRect.width(),(int)contentsRect.width()-14));
-//    p->save();
-//    p->setPen(Qt::white);
-//    p->drawText(contentsRect,
-//            Qt::AlignBottom | Qt::AlignHCenter,
-//            "Hello Plasmoid!");
-//    p->restore();
-//}
+    // 从最小的字体开始，知道填满整个区域
+    const int smallest = KGlobalSettings::smallestReadableFont().pointSize();
+    font.setPointSize(smallest);
+
+    do {
+        if (first) {
+            first = false;
+        } else  {
+            font.setPointSize(font.pointSize() + 1);
+        }
+
+        const QFontMetrics fm(font);        
+        tmpRect = fm.boundingRect(rect, Qt::TextSingleLine | Qt::AlignCenter, text);
+        if (tmpRect.width() >= rect.width() || tmpRect.height() > rect.height())
+        {
+            break;
+        }
+    } while (true);
+
+    rect = tmpRect;
+}
+
+
+void PlasmaEyerest::paintInterface(QPainter *p,
+        const QStyleOptionGraphicsItem *option, const QRect &contentsRect)
+{
+    Q_UNUSED(option);
+
+    p->setRenderHint(QPainter::SmoothPixmapTransform);
+    p->setRenderHint(QPainter::Antialiasing);
+
+    QRect tmpRect = contentsRect;
+    QFont tmpFont = m_font;
+    const QString fake_time_string = QTime(23,59,59).toString(m_format);
+
+    prepare_font(tmpFont, tmpRect, fake_time_string);
+
+    p->setFont(tmpFont);
+    p->setPen(QPen(m_color));
+
+    //qDebug() << "contentsRect: " << contentsRect << ", tmpRect: " << tmpRect;
+    //qDebug() << "m_font: " << m_font << ", tmpFont: " << tmpFont;
+
+    p->drawText(tmpRect, Qt::TextSingleLine | Qt::AlignCenter, m_time_text);
+
+}
 void PlasmaEyerest::on_status_change(uint time_remain, const QString state)
 {
     QTime tm = QTime().addSecs(time_remain);
-    m_label->setText(tm.toString(m_format));
+    m_time_text = tm.toString(m_format);
     if(m_menu_state)
     {
         m_menu_state->setText("State: " + state);
@@ -185,6 +214,8 @@ void PlasmaEyerest::on_status_change(uint time_remain, const QString state)
             m_notify_proxy->call("CloseNotification", m_notify_id);
         }
     }
+
+    update();
 }
 
 void PlasmaEyerest::on_delay(int time)
@@ -215,7 +246,7 @@ void PlasmaEyerest::send_notification()
     args.append(m_notify_id); // replaces_id
     args.append("dialog-information"); // app_icon
     args.append("It's time for a break"); // summary
-    args.append(m_label->text()); // body
+    args.append(m_time_text); // body
     args.append(QStringList() << "1" << "I Know" << "2" << "Delay 3 min"); // actions - (key,action)
     args.append(QVariantMap()); // hints - unused atm
     args.append((int)m_notify_time * 1000); // expire timout
@@ -263,6 +294,8 @@ void PlasmaEyerest::createConfigurationInterface(KConfigDialog* parent)
 
     connect(m_config.format, SIGNAL(textChanged(QString)), parent, SLOT(settingsModified()));
     connect(m_config.notify_time, SIGNAL(valueChanged(int)), parent, SLOT(settingsModified()));
+    connect(m_config.font, SIGNAL(currentFontChanged(QFont)), parent, SLOT(settingsModified()));
+    connect(m_config.color, SIGNAL(changed(QColor)), parent, SLOT(settingsModified()));
 }
 
 void PlasmaEyerest::on_config_accepted()
@@ -271,9 +304,13 @@ void PlasmaEyerest::on_config_accepted()
 
     m_format = m_config.format->text();
     m_notify_time = m_config.notify_time->value();
+    m_font = m_config.font->currentFont();
+    m_color = m_config.color->color();
 
     cg.writeEntry("format", m_format);
     cg.writeEntry("notify_time", m_notify_time);
+    cg.writeEntry("font", m_font);
+    cg.writeEntry("color", m_color);
 }
 
 

@@ -23,7 +23,7 @@ namespace Plasma
 }
 
 // Define our plasma Applet
-class PlasmaEyerest: public Plasma::PopupApplet
+class PlasmaEyerest: public Plasma::Applet
 {
     Q_OBJECT
 public:
@@ -32,9 +32,9 @@ public:
         ~PlasmaEyerest();
 
         // The paintInterface procedure paints the applet to screen
-        //void paintInterface(QPainter *p,
-        //        const QStyleOptionGraphicsItem *option,
-        //        const QRect& contentsRect);
+        void paintInterface(QPainter *p,
+                const QStyleOptionGraphicsItem *option,
+                const QRect& contentsRect);
         virtual void init();
 
         virtual void createConfigurationInterface(KConfigDialog* parent);
@@ -42,7 +42,8 @@ public:
         QList<QAction*>  contextualActions ();
 
 private:
-        Plasma::Label *m_label;
+        //Plasma::Label *m_label;
+        QString m_time_text;
         QAction *m_menu_state;
 
         org::zlbruce::eyerest::basic* m_eye_proxy;
@@ -52,11 +53,14 @@ private:
         bool m_notified;            // 是否通知过了
 
         void send_notification();
+        void prepare_font(QFont &font, QRect &rect, const QString &text);
 
         // config
         Ui::Config m_config;
         QString m_format;
         uint m_notify_time;
+        QFont m_font;
+        QColor m_color;
 
 private Q_SLOTS: 
         void on_status_change(uint time_remain, const QString state);
