@@ -208,23 +208,24 @@ void PlasmaEyerest::on_rest_now()
  */
 void PlasmaEyerest::send_notification()
 {
-  QList<QVariant> args;
 
-  args.append("Eyerest"); // app_name
-  args.append(m_notify_id); // replaces_id
-  args.append("dialog-information"); // app_icon
-  args.append("It's time for a break"); // summary
-  args.append(m_label->text()); // body
-  args.append(QStringList() << "1" << "I Know" << "2" << "Delay 3 min"); // actions - (key,action)
-  args.append(QVariantMap()); // hints - unused atm
-  args.append(m_notify_time * 1000); // expire timout
+    QList<QVariant> args;
 
-  QDBusReply<uint> reply = m_notify_proxy->callWithArgumentList(QDBus::AutoDetect, "Notify", args);
+    args.append("Eyerest"); // app_name
+    args.append(m_notify_id); // replaces_id
+    args.append("dialog-information"); // app_icon
+    args.append("It's time for a break"); // summary
+    args.append(m_label->text()); // body
+    args.append(QStringList() << "1" << "I Know" << "2" << "Delay 3 min"); // actions - (key,action)
+    args.append(QVariantMap()); // hints - unused atm
+    args.append((int)m_notify_time * 1000); // expire timout
 
-  if(reply.isValid())
-  {
-      m_notify_id = reply.value();
-  }
+    QDBusReply<uint> reply = m_notify_proxy->callWithArgumentList(QDBus::Block, "Notify", args);
+
+    if(reply.isValid())
+    {
+        m_notify_id = reply.value();
+    }
 
 }
 
