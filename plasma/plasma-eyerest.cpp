@@ -46,16 +46,16 @@ PlasmaEyerest::~PlasmaEyerest()
 QList<QAction*> PlasmaEyerest::contextualActions()
 {
     m_menu_state = new QAction(this);
-    m_menu_state->setText("State:");
+    m_menu_state->setText(i18n("State: "));
 
     QAction* sep0 = new QAction(this);
     sep0->setSeparator(true);
 
     QAction* delay3min = new QAction(this);
-    delay3min->setText("Delay 3 min");
+    delay3min->setText(i18n("Delay 3 min"));
 
     QAction* delay5min = new QAction(this);
-    delay5min->setText("Delay 5 min");
+    delay5min->setText(i18n("Delay 5 min"));
 
     QSignalMapper* signalMapper = new QSignalMapper (this);
     connect (delay3min, SIGNAL(triggered()), signalMapper, SLOT(map())) ;
@@ -71,15 +71,15 @@ QList<QAction*> PlasmaEyerest::contextualActions()
     sep1->setSeparator(true);
 
     QAction* pause = new QAction(this);
-    pause->setText("Pause");
+    pause->setText(i18n("Pause"));
     connect(pause, SIGNAL(triggered()), this, SLOT(on_pause()));
 
     QAction* unpause = new QAction(this);
-    unpause->setText("Continue");
+    unpause->setText(i18n("Continue"));
     connect(unpause, SIGNAL(triggered()), this, SLOT(on_unpause()));
 
     QAction* rest_now = new QAction(this);
-    rest_now->setText("Rest now");
+    rest_now->setText(i18n("Rest now"));
     connect(rest_now, SIGNAL(triggered()), this, SLOT(on_rest_now()));
 
     /*
@@ -116,6 +116,9 @@ void PlasmaEyerest::init()
             "/",
             QDBusConnection::sessionBus(),
             this);
+
+    // 让 eyerest-daemon 运行
+    m_eye_proxy->unpause();
 
     connect(m_eye_proxy, SIGNAL(status(uint, const QString)), this, SLOT(on_status_change(uint, const QString)));
 
@@ -198,13 +201,13 @@ void PlasmaEyerest::on_status_change(uint time_remain, const QString state)
     m_time_text = tm.toString(m_format);
     if(m_menu_state)
     {
-        m_menu_state->setText("State: " + state);
+        m_menu_state->setText(i18n("State: ") + state);
     }
 
     if(time_remain < m_notify_time)
     {
         if(!m_notified)
-            send_notification();
+            send_notification(time_remain);
     }
     else
     {
@@ -237,7 +240,7 @@ void PlasmaEyerest::on_rest_now()
 /**
  * Display a passive notification popup using the D-Bus interface, if possible.
  */
-void PlasmaEyerest::send_notification()
+void PlasmaEyerest::send_notification(int timeout)
 {
 
     QList<QVariant> args;
@@ -245,11 +248,11 @@ void PlasmaEyerest::send_notification()
     args.append("Eyerest"); // app_name
     args.append(m_notify_id); // replaces_id
     args.append("dialog-information"); // app_icon
-    args.append("It's time for a break"); // summary
+    args.append(i18n("It's time for a break")); // summary
     args.append(m_time_text); // body
-    args.append(QStringList() << "1" << "I Know" << "2" << "Delay 3 min"); // actions - (key,action)
+    args.append(QStringList() << "1" << i18n("I Know") << "2" << i18n("Delay 3 min")); // actions - (key,action)
     args.append(QVariantMap()); // hints - unused atm
-    args.append((int)m_notify_time * 1000); // expire timout
+    args.append(timeout* 1000); // expire timout
 
     QDBusReply<uint> reply = m_notify_proxy->callWithArgumentList(QDBus::Block, "Notify", args);
 
@@ -286,8 +289,10 @@ void PlasmaEyerest::createConfigurationInterface(KConfigDialog* parent)
 
     m_config.format->setText(m_format);
     m_config.notify_time->setValue(m_notify_time);
+    m_config.font->setCurrentFont(m_font);
+    m_config.color->setColor(m_color);
 
-    parent->addPage(widget, i18n("Eyerest"), "eyerest");
+    parent->addPage(widget, "Eyerest", "eyerest");
 
     connect(parent, SIGNAL(applyClicked()), this, SLOT(on_config_accepted()));
     connect(parent, SIGNAL(okClicked()), this, SLOT(on_config_accepted()));

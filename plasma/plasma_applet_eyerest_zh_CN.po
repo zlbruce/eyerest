@@ -1,0 +1,76 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR This_file_is_part_of_KDE
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# zlbruce <zhangleibruce@gmail.com>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: v0.0.1\n"
+"Report-Msgid-Bugs-To: http://bugs.kde.org\n"
+"POT-Creation-Date: 2012-11-12 23:08+0800\n"
+"PO-Revision-Date: 2012-11-12 23:15+0800\n"
+"Last-Translator: zlbruce <zhangleibruce@gmail.com>\n"
+"Language-Team: 汉语 <>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. i18n: ectx: property (windowTitle), widget (QWidget, Config)
+#: eyerest-config.ui:26
+msgid "Form"
+msgstr "Form"
+
+#. i18n: ectx: property (text), widget (QLabel, label)
+#: eyerest-config.ui:49
+msgid "Display format:"
+msgstr "时间显示格式："
+
+#. i18n: ectx: property (text), widget (QLabel, label_2)
+#: eyerest-config.ui:76
+msgid "Notify time:"
+msgstr "休息通知的时间："
+
+#. i18n: ectx: property (text), widget (QLabel, label_3)
+#: eyerest-config.ui:109
+msgid "Font:"
+msgstr "字体："
+
+#. i18n: ectx: property (text), widget (QLabel, label_4)
+#: eyerest-config.ui:136
+msgid "Color:"
+msgstr "颜色："
+
+#: plasma-eyerest.cpp:49 plasma-eyerest.cpp:204
+msgid "State: "
+msgstr "状态："
+
+#: plasma-eyerest.cpp:55 plasma-eyerest.cpp:253
+msgid "Delay 3 min"
+msgstr "推迟3分钟"
+
+#: plasma-eyerest.cpp:58
+msgid "Delay 5 min"
+msgstr "推迟5分钟"
+
+#: plasma-eyerest.cpp:74
+msgid "Pause"
+msgstr "暂停"
+
+#: plasma-eyerest.cpp:78
+msgid "Continue"
+msgstr "继续"
+
+#: plasma-eyerest.cpp:82
+msgid "Rest now"
+msgstr "立即休息"
+
+#: plasma-eyerest.cpp:251
+msgid "It's time for a break"
+msgstr "休息时间到啦"
+
+#: plasma-eyerest.cpp:253
+msgid "I Know"
+msgstr "知道了"
