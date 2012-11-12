@@ -52,6 +52,7 @@ private:
         uint m_notify_id;
         bool m_notified;            // 是否通知过了
 
+        void init_notify_proxy();
         void send_notification(int timeout);
         void prepare_font(QFont &font, QRect &rect, const QString &text);
 

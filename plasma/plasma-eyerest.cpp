@@ -122,26 +122,6 @@ void PlasmaEyerest::init()
 
     connect(m_eye_proxy, SIGNAL(status(uint, const QString)), this, SLOT(on_status_change(uint, const QString)));
 
-    const QString dbusNotifyServiceName = "org.freedesktop.Notifications";
-    const QString dbusNotifyInterfaceName = "org.freedesktop.Notifications";
-    const QString dbusNotifyPath = "/org/freedesktop/Notifications";
-    m_notify_proxy = new QDBusInterface(dbusNotifyServiceName,
-            dbusNotifyPath,
-            dbusNotifyInterfaceName,
-            QDBusConnection::sessionBus(),
-            this);
-    m_notify_proxy->connection().connect(dbusNotifyServiceName,
-            dbusNotifyPath,
-            dbusNotifyInterfaceName,
-            "NotificationClosed",
-            this,
-            SLOT(on_notify_close(uint, uint)));
-    m_notify_proxy->connection().connect(dbusNotifyServiceName,
-            dbusNotifyPath,
-            dbusNotifyInterfaceName,
-            "ActionInvoked",
-            this,
-            SLOT(on_notify_action_invoked(uint, QString)));
 } 
 
 void PlasmaEyerest::prepare_font(QFont &font, QRect &rect, const QString &text)
@@ -237,11 +217,42 @@ void PlasmaEyerest::on_rest_now()
 {
     m_eye_proxy->rest_now();
 }
+
+void PlasmaEyerest::init_notify_proxy()
+{
+    const QString dbusNotifyServiceName = "org.freedesktop.Notifications";
+    const QString dbusNotifyInterfaceName = "org.freedesktop.Notifications";
+    const QString dbusNotifyPath = "/org/freedesktop/Notifications";
+
+    m_notify_id = 0;
+    m_notify_proxy = new QDBusInterface(dbusNotifyServiceName,
+            dbusNotifyPath,
+            dbusNotifyInterfaceName,
+            QDBusConnection::sessionBus(),
+            this);
+    m_notify_proxy->connection().connect(dbusNotifyServiceName,
+            dbusNotifyPath,
+            dbusNotifyInterfaceName,
+            "NotificationClosed",
+            this,
+            SLOT(on_notify_close(uint, uint)));
+    m_notify_proxy->connection().connect(dbusNotifyServiceName,
+            dbusNotifyPath,
+            dbusNotifyInterfaceName,
+            "ActionInvoked",
+            this,
+            SLOT(on_notify_action_invoked(uint, QString)));
+}
 /**
  * Display a passive notification popup using the D-Bus interface, if possible.
  */
 void PlasmaEyerest::send_notification(int timeout)
 {
+    // 将初始化 notify 延迟到发送的时候，防止notification-daemon先于knotify启动
+    if(m_notify_proxy == NULL)
+    {
+        init_notify_proxy();
+    }
 
     QList<QVariant> args;
 

@@ -20,7 +20,7 @@ eyerest是一款通过定时锁定屏幕，提醒用户休息的小软件
  2. 推迟休息（完成）
  3. 休息前提醒（完成）
 * Gnome Shell Extension（完成）
-* KDE PLASMA
+* KDE PLASMA（完成）
  
 ##编译与运行
 
@@ -73,3 +73,18 @@ eyerest是一款通过定时锁定屏幕，提醒用户休息的小软件
 
 ![Gnome Shell Extension Eyerest Pref](http://i.imgur.com/P2DWq.png)
 
+###Plasma Applet
+
+附带一个 Plasma Applet，同样在我的 KDE 桌面做进行的测试。
+
+如果由 KDE 的开发环境，那么在 `cmake` 的时候应该就能检测到，为了使编译安装之后能够被 Plasma 加载，需要这样进行编译
+
+    cmake --prefix=`kde4-config --prefix`
+    make
+    sudo make install
+
+一些截图：
+
+![Plasma Applet Eyerest Menu](http://i.imgur.com/diXLj.png)
+![Plasma Applet Eyerest Notify](http://i.imgur.com/gzP9Q.png)
+![Plasma Applet Eyerest Setting](http://i.imgur.com/1Prpo.png)
