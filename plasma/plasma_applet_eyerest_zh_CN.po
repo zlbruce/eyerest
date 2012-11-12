@@ -31,7 +31,7 @@ msgstr "时间显示格式："
 #. i18n: ectx: property (text), widget (QLabel, label_2)
 #: eyerest-config.ui:76
 msgid "Notify time:"
-msgstr "休息通知的时间："
+msgstr "提前通知的时间："
 
 #. i18n: ectx: property (text), widget (QLabel, label_3)
 #: eyerest-config.ui:109
