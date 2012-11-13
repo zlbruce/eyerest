@@ -86,5 +86,5 @@ eyerest是一款通过定时锁定屏幕，提醒用户休息的小软件
 一些截图：
 
 ![Plasma Applet Eyerest Menu](http://i.imgur.com/diXLj.png)
-![Plasma Applet Eyerest Notify](http://i.imgur.com/gzP9Q.png)
-![Plasma Applet Eyerest Setting](http://i.imgur.com/1Prpo.png)
+![Plasma Applet Eyerest Notify](http://i.imgur.com/EbG8C.png)
+![Plasma Applet Eyerest Setting](http://i.imgur.com/yIpqG.png)
