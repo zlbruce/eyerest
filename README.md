@@ -79,7 +79,7 @@ eyerest是一款通过定时锁定屏幕，提醒用户休息的小软件
 
 如果由 KDE 的开发环境，那么在 `cmake` 的时候应该就能检测到，为了使编译安装之后能够被 Plasma 加载，需要这样进行编译
 
-    cmake --prefix=`kde4-config --prefix`
+    cmake -D BUILD_PLASMA=1 --prefix=`kde4-config --prefix` .
     make
     sudo make install
 
@@ -88,3 +88,13 @@ eyerest是一款通过定时锁定屏幕，提醒用户休息的小软件
 ![Plasma Applet Eyerest Menu](http://i.imgur.com/diXLj.png)
 ![Plasma Applet Eyerest Notify](http://i.imgur.com/EbG8C.png)
 ![Plasma Applet Eyerest Setting](http://i.imgur.com/yIpqG.png)
+
+###systray
+
+提供一个 systray 方便使用其他 WM 的用户（比如我用的 xmonad）
+
+编译：
+    cmake -D BUILD_SYSTRAY=1 .
+    make
+    sudo make install
+
