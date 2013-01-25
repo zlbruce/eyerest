@@ -218,6 +218,11 @@ static void on_rest_now (GtkStatusIcon* status_icon, gpointer user_data)
     }
 }
 
+static void on_quit (GtkStatusIcon* status_icon, gpointer user_data)
+{
+    gtk_main_quit();
+}
+
 static GtkWidget* create_menu()
 {
     GtkWidget* menu;
@@ -231,13 +236,21 @@ static GtkWidget* create_menu()
     GtkWidget* pause = gtk_menu_item_new_with_label("pause");
     GtkWidget* unpause = gtk_menu_item_new_with_label("continue");
     GtkWidget* rest_now = gtk_menu_item_new_with_label("rest now");
+    GtkWidget* quit = gtk_menu_item_new_with_label("quit");
+    GtkWidget* sep1 = gtk_separator_menu_item_new();
+    GtkWidget* sep2 = gtk_separator_menu_item_new();
+    GtkWidget* sep3 = gtk_separator_menu_item_new();
 
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item_state);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), sep1);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), delay3);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), delay5);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), sep2);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), pause);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), unpause);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), rest_now);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), sep3);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), quit);
 
     g_signal_connect (G_OBJECT(delay3), "activate",
             G_CALLBACK(on_delay), GUINT_TO_POINTER(180));
@@ -249,6 +262,8 @@ static GtkWidget* create_menu()
             G_CALLBACK(on_unpause), NULL);
     g_signal_connect (G_OBJECT(rest_now), "activate",
             G_CALLBACK(on_rest_now), NULL);
+    g_signal_connect (G_OBJECT(quit), "activate",
+            G_CALLBACK(on_quit), NULL);
 
     gtk_widget_show_all(menu);
 
@@ -306,6 +321,7 @@ void on_status (
     //g_printf("time_str = %s, state = %s\n", time_str, arg_state);
 
     gtk_menu_item_set_label(GTK_MENU_ITEM(menu_item_state), time_str);
+    gtk_status_icon_set_tooltip_text (tray_icon, time_str);
 
     if(arg_time_remain < 60)
     {
