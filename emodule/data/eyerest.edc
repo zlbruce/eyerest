@@ -1,0 +1,90 @@
+/* define what images we need */
+images {
+    image: "gadcon_logo.png" COMP;
+}
+
+/* define objects - groups of parts */
+collections {
+    group {
+        name: "modules/eyerest/main";
+        /* hint that the max size is 128x128 */
+        max: 128 128;
+        parts { /* a part */
+            part { name: "logo"; type: IMAGE; /* the name and type */
+                description { /* the default state */
+                    state: "default" 0.0;
+                    aspect: 1.0 1.0;
+                    aspect_preference: BOTH;
+                    image.normal: "gadcon_logo.png";
+                }
+                description { /* more states for the bouncy animation */
+                    state: "b1" 0.0; inherit: "default" 0.0;
+                    rel1.relative: -0.50 -0.50;
+                    rel2.relative:  1.50  1.50;
+                }
+                description {
+                    state: "b2" 0.0; inherit: "default" 0.0;
+                    rel1.relative:  0.30  0.30;
+                    rel2.relative:  0.70  0.70;
+                }
+                description {
+                    state: "b3" 0.0; inherit: "default" 0.0;
+                    rel1.relative: -0.15 -0.15;
+                    rel2.relative:  1.15  1.15;
+                }
+                description {
+                    state: "b4" 0.0; inherit: "default" 0.0;
+                    rel1.relative:  0.07  0.07;
+                    rel2.relative:  0.93  0.93;
+                }
+                description {
+                    state: "b5" 0.0; inherit: "default" 0.0;
+                    rel1.relative: -0.04 -0.04;
+                    rel2.relative:  1.04  1.04;
+                }
+                description {
+                    state: "b6" 0.0; inherit: "default" 0.0;
+                    rel1.relative:  0.02  0.02;
+                    rel2.relative:  0.98  0.98;
+                }
+                description {
+                    state: "b7" 0.0; inherit: "default" 0.0;
+                    rel1.relative: -0.01 -0.01;
+                    rel2.relative:  1.01  1.01;
+                }
+                description {
+                    state: "b8" 0.0; inherit: "default" 0.0;
+                    rel1.relative:  0.00  0.00;
+                    rel2.relative:  1.00  1.00;
+                }
+            }
+        }
+        programs { /* programs - where we react to events/signals */
+            program { name: "down1"; after: "down2"; /* on a mouse click */
+                signal: "mouse,down,*"; source: "logo"; /* start an anim chain */
+                action:  STATE_SET "b1" 0.0; target: "logo"; transition: LINEAR 0.1;
+            }
+            program { name: "down2"; after: "down3"; /* next stage in the chain */
+                action:  STATE_SET "b2" 0.0; target: "logo"; transition: LINEAR 0.11;
+            }
+            program { name: "down3"; after: "down4"; /* etc. each one using */
+                action:  STATE_SET "b3" 0.0; target: "logo"; transition: LINEAR 0.12;
+            }
+            program { name: "down4"; after: "down5"; /* a new state */
+                action:  STATE_SET "b4" 0.0; target: "logo"; transition: LINEAR 0.14;
+            }
+            program { name: "down5"; after: "down6";
+                action:  STATE_SET "b5" 0.0; target: "logo"; transition: LINEAR 0.17;
+            }
+            program { name: "down6"; after: "down7";
+                action:  STATE_SET "b6" 0.0; target: "logo"; transition: LINEAR 0.21;
+            }
+            program { name: "down7"; after: "down8";
+                action:  STATE_SET "b7" 0.0; target: "logo"; transition: LINEAR 0.26;
+            }
+            program { name: "down8";
+                action:  STATE_SET "b8" 0.0; target: "logo"; transition: LINEAR 0.32;
+            }
+        }
+    }
+}
