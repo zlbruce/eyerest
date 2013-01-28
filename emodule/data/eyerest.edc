@@ -10,7 +10,9 @@ collections {
         /* hint that the max size is 128x128 */
         max: 128 128;
         parts { /* a part */
-            part { name: "logo"; type: IMAGE; /* the name and type */
+            part { 
+                name: "logo"; 
+                type: IMAGE; /* the name and type */
                 description { /* the default state */
                     state: "default" 0.0;
                     aspect: 1.0 1.0;
@@ -56,6 +58,30 @@ collections {
                     state: "b8" 0.0; inherit: "default" 0.0;
                     rel1.relative:  0.00  0.00;
                     rel2.relative:  1.00  1.00;
+                }
+            }
+            part {
+                name: "time_text"; 
+                type: TEXT; /* the name and type */
+                description { /* the default state */
+                    state: "default" 0.0;
+                    //aspect: 1.0 1.0;
+                    //aspect_preference: BOTH;
+                }
+            }
+            part {
+                name: "state_text"; 
+                type: TEXT; /* the name and type */
+                description { /* the default state */
+                    state: "default" 0.0;
+                    //aspect: 1.0 1.0;
+                    //aspect_preference: BOTH;
+                }
+
+                description {
+                    state: "hidden" 0.0;
+                    inherit: "default" 0.0;
+                    visible: 0;
                 }
             }
         }

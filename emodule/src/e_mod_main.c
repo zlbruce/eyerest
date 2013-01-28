@@ -1,5 +1,6 @@
 #include <e.h>
 #include "e_mod_main.h"
+#include "dbus_eyerest.h"
 
 /* gadcon requirements */
 static E_Gadcon_Client *_gc_init(E_Gadcon *gc, const char *name, const char *id, const char *style);
@@ -25,9 +26,16 @@ static const E_Gadcon_Client_Class _gadcon_class =
 /***************************************************************************/
 static void _eyerest_cb_mouse_down(void *data, Evas *e, Evas_Object *obj, void *event_info);
 static void _eyerest_menu_cb_post(void *data, E_Menu *m);
+
+static void _eyerest_on_state_change(uint32_t time_remain, const char* state, void* ctx);
 /***************************************************************************/
 
 /***************************************************************************/
+static void _mi_pause_cb(void *data, E_Menu *m, E_Menu_Item *mi);
+static void _mi_unpause_cb(void *data, E_Menu *m, E_Menu_Item *mi);
+static void _mi_rest_now_cb(void *data, E_Menu *m, E_Menu_Item *mi);
+static void _mi_delay_cb(void *data, E_Menu *m, E_Menu_Item *mi);
+static void _mi_setting_cb(void *data, E_Menu *m, E_Menu_Item *mi);
 /***************************************************************************/
 
 /***************************************************************************/
@@ -126,7 +134,7 @@ static void _gc_orient(E_Gadcon_Client *gcc, E_Gadcon_Orient orient)
  */
 static const char * _gc_label(const E_Gadcon_Client_Class *client_class)
 {
-   return ("Eyerest");
+    return ("Eyerest");
 }
 
 
@@ -159,6 +167,36 @@ static const char * _gc_id_new(const E_Gadcon_Client_Class *client_class)
     return buf;
 }
 
+static E_Menu* eyerest_menu_new()
+{
+    E_Menu* m = e_menu_new();
+    E_Menu_Item* mi_pause = e_menu_item_new(m);
+    E_Menu_Item* mi_unpause = e_menu_item_new(m);
+    E_Menu_Item* mi_rest_now = e_menu_item_new(m);
+    E_Menu_Item* mi_sep1 = e_menu_item_new(m);
+    E_Menu_Item* mi_delay_3 = e_menu_item_new(m);
+    E_Menu_Item* mi_delay_5 = e_menu_item_new(m);
+    E_Menu_Item* mi_sep2 = e_menu_item_new(m);
+    E_Menu_Item* mi_setting = e_menu_item_new(m);
+
+    e_menu_item_label_set(mi_pause, _("pause"));
+    e_menu_item_label_set(mi_unpause, _("unpause"));
+    e_menu_item_label_set(mi_rest_now, _("rest now"));
+    e_menu_item_separator_set(mi_sep1, 1);
+    e_menu_item_label_set(mi_delay_3, _("delay 3 min"));
+    e_menu_item_label_set(mi_delay_5, _("delay 5 min"));
+    e_menu_item_separator_set(mi_sep2, 1);
+    e_menu_item_label_set(mi_setting, _("setting..."));
+
+    e_menu_item_callback_set(mi_pause, _mi_pause_cb, NULL);
+    e_menu_item_callback_set(mi_unpause, _mi_unpause_cb, NULL);
+    e_menu_item_callback_set(mi_rest_now, _mi_rest_now_cb, NULL);
+    e_menu_item_callback_set(mi_delay_3, _mi_delay_cb, (void*)3);
+    e_menu_item_callback_set(mi_delay_5, _mi_delay_cb, (void*)5);
+    e_menu_item_callback_set(mi_setting, _mi_setting_cb, NULL);
+    return m;
+}
+
 static void _eyerest_cb_mouse_down(void *data, Evas *e, Evas_Object *obj, void *event_info)
 {
     Instance *inst;
@@ -170,7 +208,7 @@ static void _eyerest_cb_mouse_down(void *data, Evas *e, Evas_Object *obj, void *
     {
         int x, y;
 
-        inst->menu = e_int_menus_main_new();
+        inst->menu = eyerest_menu_new();
 
         e_menu_post_deactivate_callback_set(inst->menu,
                 _eyerest_menu_cb_post, inst);
@@ -193,7 +231,7 @@ static void _eyerest_cb_mouse_down(void *data, Evas *e, Evas_Object *obj, void *
 
         zone = e_util_zone_current_get(e_manager_current_get());
 
-        m = e_menu_new();
+        m = eyerest_menu_new();
         m = e_gadcon_client_util_menu_items_append(inst->gcc, m, 0);
         e_menu_post_deactivate_callback_set(m, _eyerest_menu_cb_post, inst);
         inst->menu = m;
@@ -245,6 +283,9 @@ EAPI void * e_modapi_init(E_Module *m)
 
     eyerest_config->module = m;
     e_gadcon_provider_register(&_gadcon_class);
+
+    eyerest_dbus_init(_eyerest_on_state_change, NULL);
+
     return m;
 }
 
@@ -254,6 +295,8 @@ EAPI void * e_modapi_init(E_Module *m)
  */
 EAPI int e_modapi_shutdown(E_Module *m)
 {
+    eyerest_dbus_shutdown();
+
     e_gadcon_provider_unregister(&_gadcon_class);
 
     if(eyerest_config)
@@ -278,4 +321,34 @@ EAPI int e_modapi_save(E_Module *m)
 
 /**/
 /***************************************************************************/
+static void _eyerest_on_state_change(uint32_t time_remain, const char* state, void* ctx)
+{
 
+}
+
+static void _mi_pause_cb(void *data, E_Menu *m, E_Menu_Item *mi)
+{
+    eyerest_dbus_pause();
+}
+
+static void _mi_unpause_cb(void *data, E_Menu *m, E_Menu_Item *mi)
+{
+    eyerest_dbus_unpause();
+}
+
+static void _mi_rest_now_cb(void *data, E_Menu *m, E_Menu_Item *mi)
+{
+    eyerest_dbus_rest_now();
+}
+
+static void _mi_delay_cb(void *data, E_Menu *m, E_Menu_Item *mi)
+{
+    uint32_t t = (uint32_t)data;
+
+    eyerest_dbus_delay(t);
+}
+
+static void _mi_setting_cb(void *data, E_Menu *m, E_Menu_Item *mi)
+{
+    // TODO:
+}

@@ -1,5 +1,6 @@
 set(SRC_LIST
     e_mod_main.c
+    dbus_eyerest.c
     )
 cmake_minimum_required(VERSION 2.8)
 
