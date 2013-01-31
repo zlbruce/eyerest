@@ -376,7 +376,7 @@ static void _mi_delay_cb(void *data, E_Menu *m, E_Menu_Item *mi)
 {
     uint32_t t = (uintptr_t)data;
 
-    eyerest_dbus_delay(t);
+    eyerest_dbus_delay(t * 60);
 }
 
 
