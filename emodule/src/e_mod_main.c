@@ -2,6 +2,8 @@
 #include "e_mod_main.h"
 #include "dbus_eyerest.h"
 
+#define MSG_STATE 1
+
 /* gadcon requirements */
 static E_Gadcon_Client *_gc_init(E_Gadcon *gc, const char *name, const char *id, const char *style);
 static void _gc_shutdown(E_Gadcon_Client *gcc);
@@ -321,9 +323,38 @@ EAPI int e_modapi_save(E_Module *m)
 
 /**/
 /***************************************************************************/
+static void eyerest_set_theme_label(const char* time, const char* state)
+{
+    Eina_List* l;
+    Instance* inst;
+
+    //EINA_LOG_INFO("setting cb");
+    EINA_LIST_FOREACH(eyerest_config->instances, l, inst)
+    {
+        //edje_object_message_send(inst->logo, EDJE_MESSAGE_STRING_SET, MSG_STATE, msg);
+        edje_object_part_text_set(inst->logo, "time_remain", time);
+        edje_object_part_text_set(inst->logo, "state_text", state);
+        edje_object_message_signal_process(inst->logo);
+        //EINA_LOG_INFO("setting cb xxx");
+    }
+}
+
 static void _eyerest_on_state_change(uint32_t time_remain, const char* state, void* ctx)
 {
+    time_t t = time_remain;
+    //
+    static char time_str[PATH_MAX];
+    struct tm* tm = localtime(&t);
+    if(tm == NULL)
+    {
+        snprintf(time_str, sizeof(time_str), "%u", time_remain);
+    }
+    else
+    {
+        strftime(time_str, sizeof(time_str), "%M:%S", tm);
+    }
 
+    eyerest_set_theme_label(time_str, state);
 }
 
 static void _mi_pause_cb(void *data, E_Menu *m, E_Menu_Item *mi)
@@ -343,12 +374,14 @@ static void _mi_rest_now_cb(void *data, E_Menu *m, E_Menu_Item *mi)
 
 static void _mi_delay_cb(void *data, E_Menu *m, E_Menu_Item *mi)
 {
-    uint32_t t = (uint32_t)data;
+    uint32_t t = (uintptr_t)data;
 
     eyerest_dbus_delay(t);
 }
 
+
 static void _mi_setting_cb(void *data, E_Menu *m, E_Menu_Item *mi)
 {
-    // TODO:
+    // test message
+    eyerest_set_theme_label("test_time", "test_lable");
 }
