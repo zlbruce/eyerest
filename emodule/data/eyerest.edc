@@ -10,7 +10,8 @@ collections {
     group {
         name: "modules/eyerest/main";
         /* hint that the max size is 128x128 */
-        max: 164 128;
+        min: 20 16;
+        max: 160 128;
         parts {
             part {
                 name: "time_remain"; 
