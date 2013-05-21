@@ -21,6 +21,7 @@
 #include "eyerest-dbus.h"
 
 static gboolean s_status = FALSE;
+static gchar* s_time_format = NULL;
 static guint s_delay_time = 0;
 static gboolean s_pause = FALSE;
 static gboolean s_continue = FALSE;
@@ -29,6 +30,7 @@ static gboolean s_rest_now = FALSE;
 static GOptionEntry entries[] =
 {
     { "status", 's', 0, G_OPTION_ARG_NONE, &s_status, "Print the status", NULL },
+    { "time", 't', 0, G_OPTION_ARG_STRING, &s_time_format, "Print the time", "FORMAT"},
     { "delay", 'd', 0, G_OPTION_ARG_INT, &s_delay_time, "Delay the rest", "T"},
     { "pause", 'p', 0, G_OPTION_ARG_NONE, &s_pause, "Pause counter", NULL},
     { "continue", 'c', 0, G_OPTION_ARG_NONE, &s_continue, "Continue counter", NULL},
@@ -41,18 +43,6 @@ static void process_request(OrgZlbruceEyerestBasic* proxy)
     GError *error = NULL;
     if(s_status)
     {
-        guint out_time = 0;
-        error = NULL;
-        if (!org_zlbruce_eyerest_basic_call_get_time_remain_sync (
-                    proxy,
-                    &out_time,
-                    NULL,
-                    &error))
-        {
-            g_print ("call dbus methed get_time_remain failed: %s\n", error->message);
-            return;
-        }
-
         gchar* st = NULL;
         error = NULL;
         if (!org_zlbruce_eyerest_basic_call_get_state_sync (
@@ -65,8 +55,35 @@ static void process_request(OrgZlbruceEyerestBasic* proxy)
             return;
         }
 
-        g_print("time remain: %u\n", out_time);
         g_print("state:       %s\n", st);
+    }
+    if(s_time_format)
+    {
+        guint out_time = 0;
+        error = NULL;
+        if(!org_zlbruce_eyerest_basic_call_get_time_remain_sync(
+                    proxy,
+                    &out_time,
+                    NULL,
+                    &error))
+        {
+            g_print ("call dbus methed get_time_remain failed: %s\n", error->message);
+            return;
+        }
+        
+        time_t time = out_time;
+        static gchar time_str[PATH_MAX];
+        struct tm* tm = localtime(&time);
+        if(tm == NULL)
+        {
+            g_snprintf(time_str, sizeof(time_str), "%lu", (unsigned long)time);
+        }
+        else
+        {
+            strftime(time_str, sizeof(time_str), s_time_format, tm);
+        }
+
+        g_print("%s\n", time_str);
     }
 
     if(s_delay_time != 0)
