@@ -131,10 +131,12 @@ static void send_notification(gchar* text, gint time_remain)
     GVariantBuilder hints;
 
     g_variant_builder_init (&actions, G_VARIANT_TYPE ("as"));
+#ifndef NO_NOTIFY_ACTIONS
     g_variant_builder_add(&actions, "s", "1");
     g_variant_builder_add(&actions, "s", "I kown");
     g_variant_builder_add(&actions, "s", "2");
     g_variant_builder_add(&actions, "s", "Delay 3 min");
+#endif
 
     g_variant_builder_init (&hints, G_VARIANT_TYPE ("a{sv}"));
 
@@ -308,14 +310,13 @@ void on_status (
     time_t time_remain = arg_time_remain;
     static gchar time_str[PATH_MAX];
     struct tm* tm = localtime(&time_remain);
-    int len = 0;
     if(tm == NULL)
     {
-        len = g_snprintf(time_str, sizeof(time_str), "%lu", (unsigned long)time);
+        g_snprintf(time_str, sizeof(time_str), "%lu", (unsigned long)time);
     }
     else
     {
-        len = strftime(time_str, sizeof(time_str), "%M:%S", tm);
+        strftime(time_str, sizeof(time_str), "%M:%S", tm);
     }
 
     //g_printf("time_str = %s, state = %s\n", time_str, arg_state);

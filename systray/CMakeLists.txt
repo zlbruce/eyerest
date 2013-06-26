@@ -41,6 +41,11 @@ add_custom_command(OUTPUT eyerest-dbus.c
     )
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
+if(NO_NOTIFY_ACTIONS)
+    add_definitions( -DNO_NOTIFY_ACTIONS )
+endif(NO_NOTIFY_ACTIONS)
+
+
 add_executable(eyerest-tray ${SRC_LIST})
 TARGET_LINK_LIBRARIES(eyerest-tray ${SRC_LIBS})
 INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/eyerest-tray DESTINATION bin)
