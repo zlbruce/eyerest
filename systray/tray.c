@@ -324,7 +324,7 @@ void on_status (
     gtk_menu_item_set_label(GTK_MENU_ITEM(menu_item_state), time_str);
     gtk_status_icon_set_tooltip_text (tray_icon, time_str);
 
-    if(arg_time_remain < 60)
+    if(arg_time_remain < 60 && arg_time_remain > 0)
     {
         if(!g_notified)
         {
