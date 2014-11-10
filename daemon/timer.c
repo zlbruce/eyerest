@@ -17,7 +17,7 @@
  */
 #include <stdio.h>
 #include <unistd.h>
-#include <event.h>
+#include <glib.h>
 
 #include "timer.h"
 #include "state.h"
