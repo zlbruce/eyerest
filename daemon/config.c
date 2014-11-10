@@ -42,6 +42,9 @@ static GOptionEntry entries[] =
     { "y-coordinate", 'y', 0, G_OPTION_ARG_INT, &g_config.y_coordinate, "Y-coordinate (percent)", "50"},
     { "format", 'F', 0, G_OPTION_ARG_STRING, &g_config.format, "Display format", "FORMAT"},
     { "foreground", 'g', 0, G_OPTION_ARG_NONE, &g_config.foreground, "Run in foreground, do not detach from the console.", NULL },
+    { "notify-time", 't', 0, G_OPTION_ARG_INT, &g_config.notify_time, "Notify time (second)", "60"},
+    { "notify-format", 'n', 0, G_OPTION_ARG_STRING, &g_config.notify_format, "Nodify Text Format", "notify-osd"},
+    { "notify-action", 'a', 0, G_OPTION_ARG_INT, &g_config.notify_action, "Send Notify Acton(1) or Not(0)", "0"},
     { NULL }
 };
 
@@ -90,9 +93,18 @@ static void config_from_file()
         SET_DEFAULT_VALUE_CPYSTR(g_config.format, format);
         g_free(font);
         g_free(color);
+        g_free(format);
 
         GET_DEFAULT_VALUE(g_config.x_coordinate,   g_key_file_get_integer (key_file, "Display", "x-coordinate", NULL));
         GET_DEFAULT_VALUE(g_config.y_coordinate,   g_key_file_get_integer (key_file, "Display", "y-coordinate", NULL));
+
+        gchar* notify_name = g_key_file_get_locale_string(key_file, "Notify", "format", NULL, NULL);
+        SET_DEFAULT_VALUE_CPYSTR(g_config.notify_format, notify_name);
+        g_free(notify_name);
+
+        GET_DEFAULT_VALUE(g_config.notify_time,   g_key_file_get_integer (key_file, "Notify", "time", NULL));
+        GET_DEFAULT_VALUE(g_config.notify_action, g_key_file_get_integer (key_file, "Notify", "action", NULL));
+
     }
 
     g_key_file_free(key_file);
@@ -105,12 +117,16 @@ static void config_set_default()
     GET_DEFAULT_VALUE(g_config.rest_time,      3*60);
     GET_DEFAULT_VALUE(g_config.max_idle_time,  5*60);
 
-    GET_DEFAULT_VALUE_CPYSTR(g_config.font, "Monospace:size=28");
-    GET_DEFAULT_VALUE_CPYSTR(g_config.color, "red");
+    GET_DEFAULT_VALUE_CPYSTR(g_config.font,   "Monospace:size=28");
+    GET_DEFAULT_VALUE_CPYSTR(g_config.color,  "red");
     GET_DEFAULT_VALUE_CPYSTR(g_config.format, "%M:%S");
 
     GET_DEFAULT_VALUE(g_config.x_coordinate,   50);
     GET_DEFAULT_VALUE(g_config.y_coordinate,   50);
+
+    GET_DEFAULT_VALUE_CPYSTR(g_config.notify_format, "%M:%S");
+    GET_DEFAULT_VALUE(g_config.notify_time,          60);
+    GET_DEFAULT_VALUE(g_config.notify_action,        0);
 }
 
 gboolean config_init(int argc, char* argv[])
@@ -125,5 +141,6 @@ gboolean config_init(int argc, char* argv[])
 
     g_print("interval = %d\nrest_time = %d\nmax_idle_time = %d\n", g_config.interval, g_config.rest_time, g_config.max_idle_time);
     g_print("font = %s\ncolor = %s\nformat = %s\nx = %d\ny = %d\n", g_config.font, g_config.color, g_config.format, g_config.x_coordinate, g_config.y_coordinate);
+    g_print("notify_format = %s\nnotify_time = %d\nnotify_action = %d\n", g_config.notify_format, g_config.notify_time, g_config.notify_action);
     return TRUE;
 }

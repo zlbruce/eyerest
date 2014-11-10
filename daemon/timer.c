@@ -21,6 +21,7 @@
 
 #include "timer.h"
 #include "state.h"
+#include "notify.h"
 
 #define TIMER 1
 
@@ -30,6 +31,7 @@ static GMainLoop* s_loop = NULL;
 static gboolean timer_callback(gpointer data)
 {
     state_timeout_cb(TIMER);
+    notify_timeout_cb(TIMER);
     return TRUE;
 }
 

@@ -37,6 +37,11 @@ struct eye_config
 
     // 其他
     gboolean foreground;     // 前台运行，不挂到后台
+
+    // notify 配置相关
+    gchar* notify_format;    // 提示信息的格式
+    gint notify_time;        // 提前通知时间
+    gint notify_action;      // 是否发送 Notify Action
 };
 
 extern struct eye_config g_config;
