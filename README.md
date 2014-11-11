@@ -1,5 +1,7 @@
 #eyerest
 
+[![Build Status](https://travis-ci.org/zlbruce/eyerest.svg?branch=master)](https://travis-ci.org/zlbruce/eyerest)
+
 eyerest是一款通过定时锁定屏幕，提醒用户休息的小软件
 
 相关项目：
