@@ -1,0 +1,7 @@
+language: c
+compiler:
+  - gcc
+  - clang
+install: cmake make libx11-dev libxtst-dev libxft-dev libglib2.0-dev
+# Change this to your needs
+script: cmake . && make
