@@ -42,9 +42,9 @@ static GOptionEntry entries[] =
     { "y-coordinate", 'y', 0, G_OPTION_ARG_INT, &g_config.y_coordinate, "Y-coordinate (percent)", "50"},
     { "format", 'F', 0, G_OPTION_ARG_STRING, &g_config.format, "Display format", "FORMAT"},
     { "foreground", 'g', 0, G_OPTION_ARG_NONE, &g_config.foreground, "Run in foreground, do not detach from the console.", NULL },
-    { "notify-time", 't', 0, G_OPTION_ARG_INT, &g_config.notify_time, "Notify time (second)", "60"},
-    { "notify-format", 'n', 0, G_OPTION_ARG_STRING, &g_config.notify_format, "Nodify Text Format", "notify-osd"},
-    { "notify-action", 'a', 0, G_OPTION_ARG_INT, &g_config.notify_action, "Send Notify Acton(1) or Not(0)", "0"},
+    { "notify-time", '\0', 0, G_OPTION_ARG_INT, &g_config.notify_time, "Notify time (second)", "60"},
+    { "notify-format", '\0', 0, G_OPTION_ARG_STRING, &g_config.notify_format, "Nodify Text Format", "%M-%S"},
+    { "notify-action", '\0', 0, G_OPTION_ARG_INT, &g_config.notify_action, "Send Notify Action(1) or Not(0)", "0"},
     { NULL }
 };
 

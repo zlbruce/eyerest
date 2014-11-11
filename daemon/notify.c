@@ -67,7 +67,7 @@ static void on_notify_signal (GDBusProxy *proxy,
 
 gboolean notify_init()
 {
-    GDBusProxy* notify_proxy = g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SESSION,
+    notify_proxy = g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SESSION,
             G_DBUS_PROXY_FLAGS_NONE,
             NULL,
             "org.freedesktop.Notifications",
@@ -103,6 +103,10 @@ gboolean notify_init()
 
 static void notify_send(gchar* text, gint time_remain)
 {
+    if (notify_proxy == NULL)
+    {
+        return;
+    }
     GVariantBuilder actions;
     GVariantBuilder hints;
 
@@ -184,7 +188,7 @@ void notify_timeout_cb(guint time)
     }
     else
     {
-        s_notified = TRUE;
+        s_notified = FALSE;
         notify_close();
     }
 }

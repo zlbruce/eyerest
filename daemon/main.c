@@ -29,6 +29,7 @@
 #include "config.h"
 #include "dbus.h"
 #include "state.h"
+#include "notify.h"
 
 
 int main(int argc, char* argv[]) 
@@ -53,6 +54,10 @@ int main(int argc, char* argv[])
         g_critical("dbus_init failed!\n");
     }
 
+    if (!notify_init())
+    {
+        g_critical("notify_init failed!\n");
+    }
 
     if (!xevent_init())
     {
