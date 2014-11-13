@@ -6,6 +6,7 @@ eyerest是一款通过定时锁定屏幕，提醒用户休息的小软件
 
 相关项目：
 * [zlbruce/eyerest-gnome-shell-extension](https://github.com/zlbruce/eyerest-gnome-shell-extension)
+* [zlbruce/eyerest-plasma-plugin](https://github.com/zlbruce/eyerest-plasma-plugin)
 * [zlbruce/eyerest-systray](https://github.com/zlbruce/eyerest-systray)
 
 **请使用最新的 tag 编译**
