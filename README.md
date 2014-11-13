@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/zlbruce/eyerest.svg?branch=master)](https://travis-ci.org/zlbruce/eyerest)
 
-eyerest是一款通过定时锁定屏幕，提醒用户休息的小软件
+eyerest 是一款通过定时锁定屏幕，提醒用户休息的小软件
 
 相关项目：
 * [zlbruce/eyerest-gnome-shell-extension](https://github.com/zlbruce/eyerest-gnome-shell-extension)
@@ -17,18 +17,10 @@ eyerest是一款通过定时锁定屏幕，提醒用户休息的小软件
 * 根据是否有鼠标与键盘事件检测用户是否离开
 * 可配置间隔时间，锁屏时间，空闲时间
 * 可配置锁屏时屏幕上显示的文字，位置，字体，大小与颜色
+* 锁屏前通过 notify 提醒
+* 检测是否在运行全屏程序，在运行此类程序时暂停
 * 提供dbus接口，可以进行暂停，推迟等
 
-###TODO
-
-* 增加dbus接口（完成）
-* 根据dbus接口实现
- 1. 显示剩余时间（完成）
- 2. 推迟休息（完成）
- 3. 休息前提醒（完成）
-* Gnome Shell Extension（完成）
-* KDE PLASMA（完成）
- 
 ##编译与运行
 
 ###依赖
@@ -52,7 +44,7 @@ eyerest是一款通过定时锁定屏幕，提醒用户休息的小软件
 
 安装文件如下：
 
-* dbus service文件：org.zlbruce.eyerest.service
+* dbus service 文件：org.zlbruce.eyerest.service
 * eyerest-daemon
 * eyerest-cli
 
