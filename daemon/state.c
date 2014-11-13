@@ -22,6 +22,7 @@
 #include "xlock.h"
 #include "config.h"
 #include "dbus.h"
+#include "xfullscreen.h"
 
 enum state_e
 {
@@ -242,7 +243,7 @@ static void state_active_timeout_cb(guint time)
         state_change(STATE_XLOCK);
     }
 
-    if(!s_user_pause)
+    if(!s_user_pause && !xfullscreen_has_fullscreen())
     {
         s_work_time_remain -= time;
     }

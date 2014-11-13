@@ -8,6 +8,7 @@ set(SRC_LIST
     xlock.c
     eyerest-dbus.c
     notify.c
+    xfullscreen.c
     )
 find_package(PkgConfig REQUIRED)
 

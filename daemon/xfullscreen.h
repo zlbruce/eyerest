@@ -1,12 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  xevent.h
+ *       Filename:  xfullscreen.h
  *
  *    Description:  
  *
  *        Version:  1.0
- *        Created:  2012年10月19日 10时23分36秒
+ *        Created:  2014年11月12日 16时33分36秒
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -16,31 +16,18 @@
  * =====================================================================================
  */
 
-#ifndef __XEVENT_H__
-#define __XEVENT_H__
+#ifndef __XFULLSCREEN_H__
+#define __XFULLSCREEN_H__
 
 #include <glib.h>
 
 G_BEGIN_DECLS
 
-// 判断当前是否有鼠标键盘事件
-gboolean xevent_has_event();
-
-// 判断是否有全屏程序
-gboolean xevent_has_fullscreen();
-
-// 清除所有事件
-void xevent_clear_event();
-
 // 初始化
-gboolean xevent_init();
+gboolean xfullscreen_init();
 
-// 运行监听线程
-void xevent_run();
-
-// 停止监听线程
-void xevent_stop();
-
+// 是否有全屏窗口
+gboolean xfullscreen_has_fullscreen();
 
 G_END_DECLS
-#endif  /*__XEVENT_H__*/
+#endif  /*__XFULLSCREEN_H__*/

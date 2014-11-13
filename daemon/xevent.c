@@ -39,6 +39,7 @@ void xevent_clear_event()
     s_has_event = FALSE;
 }
 
+
 // 初始化
 gboolean xevent_init()
 {
@@ -95,3 +96,4 @@ void xevent_stop()
 {
     // TODO
 }
+
