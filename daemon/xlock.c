@@ -51,7 +51,11 @@ static void xlock_unlockeachscreen(Display *dpy, Lock *lock)
     XUngrabKeyboard(dpy, CurrentTime);
 
     XftColorFree (dpy, DefaultVisual(dpy, lock->screen), DefaultColormap(dpy, lock->screen), &lock->color);
-    XftDrawDestroy (lock->draw);
+
+    if (lock->draw)
+    {
+        XftDrawDestroy (lock->draw);
+    }
 
 
     XFreePixmap(dpy, lock->pmap);
@@ -76,6 +80,8 @@ static Lock* xlock_lockeachscreen(Display* dpy, int screen)
     lock = malloc(sizeof(Lock));
     if(lock == NULL)
         return NULL;
+
+    memset(lock, 0, sizeof(Lock));
 
     lock->screen = screen;
 
@@ -112,6 +118,7 @@ static Lock* xlock_lockeachscreen(Display* dpy, int screen)
     if(!running) {
         xlock_unlockeachscreen(dpy, lock);
         lock = NULL;
+        return lock;
     }
     else 
         XSelectInput(dpy, lock->root, SubstructureNotifyMask);
@@ -175,7 +182,14 @@ void xlock_display_time_on_screen(Display* dpy, Lock* lock, time_t time)
 {
     static gchar time_str[PATH_MAX];
     struct tm* tm = localtime(&time);
+
     int len = 0;
+
+    if (lock == NULL)
+    {
+        return;
+    }
+
     if(tm == NULL)
     {
         len = g_snprintf(time_str, sizeof(time_str), "%lu", (unsigned long)time);
