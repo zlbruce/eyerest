@@ -138,7 +138,7 @@ static void on_name_lost (GDBusConnection *connection,
         const gchar     *name,
         gpointer         user_data)
 {
-    g_message("Lost the name %s on the session bus", name);
+    g_warning("Lost the name %s on the session bus", name);
 }
 
 gboolean dbus_init()
@@ -159,6 +159,9 @@ gboolean dbus_init()
 
 void dbus_sent_status(guint time_remain, const gchar* state)
 {
-    g_assert(interface);
+    if (interface == NULL)
+    {
+        return;
+    }
     org_zlbruce_eyerest_basic_emit_status (interface, time_remain, state);
 }
