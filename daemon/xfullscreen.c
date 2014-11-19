@@ -44,7 +44,6 @@ static Window get_active_window(Display* dpy,Window root)
         Window ret = w[0];
         XFree(w);
 
-        printf("active window = %d\n", ret);
         return ret;
     }
 
@@ -89,7 +88,6 @@ static gboolean is_fullscreen(Display* dpy,Window w)
         XFree(atom);
     }
 
-    printf("is not fullscreen\n");
     return FALSE;
 }
 
