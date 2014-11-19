@@ -131,14 +131,14 @@ static void on_name_acquired (GDBusConnection *connection,
         const gchar     *name,
         gpointer         user_data)
 {
-    g_print ("Acquired the name %s on the session bus\n", name);
+    g_message("Acquired the name %s on the session bus", name);
 }
 
 static void on_name_lost (GDBusConnection *connection,
         const gchar     *name,
         gpointer         user_data)
 {
-    g_print ("Lost the name %s on the session bus\n", name);
+    g_message("Lost the name %s on the session bus", name);
 }
 
 gboolean dbus_init()

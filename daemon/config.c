@@ -139,8 +139,17 @@ gboolean config_init(int argc, char* argv[])
 
     config_set_default();
 
-    g_print("interval = %d\nrest_time = %d\nmax_idle_time = %d\n", g_config.interval, g_config.rest_time, g_config.max_idle_time);
-    g_print("font = %s\ncolor = %s\nformat = %s\nx = %d\ny = %d\n", g_config.font, g_config.color, g_config.format, g_config.x_coordinate, g_config.y_coordinate);
-    g_print("notify_format = %s\nnotify_time = %d\nnotify_action = %d\n", g_config.notify_format, g_config.notify_time, g_config.notify_action);
+    g_message("interval = %d", g_config.interval);
+    g_message("rest_time = %d", g_config.rest_time);
+    g_message("max_idle_time = %d", g_config.max_idle_time);
+    g_message("font = %s", g_config.font);
+    g_message("color = %s", g_config.color);
+    g_message("format = %s", g_config.format);
+    g_message("x = %d", g_config.x_coordinate);
+    g_message("y = %d", g_config.y_coordinate);
+    g_message("notify_format = %s", g_config.notify_format);
+    g_message("notify_time = %d", g_config.notify_time);
+    g_message("notify_action = %d", g_config.notify_action);
+
     return TRUE;
 }
