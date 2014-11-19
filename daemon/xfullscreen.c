@@ -80,7 +80,6 @@ static gboolean is_fullscreen(Display* dpy,Window w)
         {
             if (fullscreen == atom[i])
             {
-                printf("is fullscreen\n");
                 return TRUE;
             }
         }
@@ -100,7 +99,7 @@ gboolean xfullscreen_has_fullscreen()
     {
         Window root = RootWindow(s_dpy, i);
         Window w = get_active_window(s_dpy, root);
-        if (is_fullscreen(s_dpy, w))
+        if (w && is_fullscreen(s_dpy, w))
         {
             return TRUE;
         }
