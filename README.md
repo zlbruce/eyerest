@@ -31,6 +31,10 @@ eyerest 是一款通过定时锁定屏幕，提醒用户休息的小软件
 * glib-2.0
 * gio-2.0
 
+Ubuntu 可以用以下命令安装依赖包:
+
+    sudo apt-get -y install cmake make libx11-dev libxtst-dev libxft-dev libglib2.0-dev
+
 ###编译
 
 进入代码目录，然后执行：
